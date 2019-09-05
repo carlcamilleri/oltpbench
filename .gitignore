@@ -21,3 +21,4 @@ results
 
 # maven output
 target
+/out
