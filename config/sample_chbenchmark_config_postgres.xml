@@ -4,9 +4,9 @@
     <!-- Connection details -->
    <dbtype>postgres</dbtype>
     <driver>org.postgresql.Driver</driver>
-    <DBUrl>jdbc:postgresql://127.0.0.1:5000/chbench</DBUrl>
+    <DBUrl>jdbc:postgresql://127.0.0.1:5432/chbench</DBUrl>
     <username>postgres</username>
-    <password></password>
+    <password>postgres</password>
     <isolation>TRANSACTION_SERIALIZABLE</isolation>
     
     <!-- Scale factor is the number of warehouses in TPCC -->
@@ -18,7 +18,7 @@
         <work>
           <time>10</time>
           <rate>10000</rate>
-          <weights>10, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5</weights>
+          <weights>5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5,5,5,5</weights>
         </work>
 	</works>
 	
@@ -27,11 +27,11 @@
     	<transactiontype>
     		<name>Q1</name>
     	</transactiontype>
-    	<!-- Doesn't work with MysQL
+   	<!-- Doesn't work with MysQL -->
     	<transactiontype>
     		<name>Q2</name>
     	</transactiontype>
-    	-->
+    	<!---->
     	<transactiontype>
     		<name>Q3</name>
     	</transactiontype>
@@ -75,22 +75,22 @@
     	<transactiontype>
     		<name>Q16</name>
     	</transactiontype>
-    	<!-- Doesn't work with MySQL
+    	<!-- Doesn't work with MySQL -->
     	<transactiontype>
     		<name>Q17</name>
     	</transactiontype>   
-    	-->
+    	<!-- -->
     	<transactiontype>
     		<name>Q18</name>
     	</transactiontype>   
     	<transactiontype>
     		<name>Q19</name>
     	</transactiontype>
-    	<!-- Doesn't work with MySQL
+    	<!-- Doesn't work with MySQL -->
     	<transactiontype>
     		<name>Q20</name>
     	</transactiontype>
-    	-->   
+    	<!-- -->   
     	<transactiontype>
     		<name>Q21</name>
     	</transactiontype>
