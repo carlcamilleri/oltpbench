@@ -227,7 +227,7 @@ public abstract class Worker<T extends BenchmarkModule> implements Runnable {
         // wait for start
         wrkldState.blockForStart();
         State preState, postState;
-        Phase phase;
+        Phase phase, postPhase;
 
         TransactionType invalidTT = TransactionType.INVALID;
         assert (invalidTT != null);
@@ -264,7 +264,7 @@ public abstract class Worker<T extends BenchmarkModule> implements Runnable {
 
             // Grab some work and update the state, in case it changed while we
             // waited.
-            pieceOfWork = wrkldState.fetchWork();
+            pieceOfWork = wrkldState.fetchWork(this.id);
             preState = wrkldState.getGlobalState();
 
             phase = this.wrkldState.getCurrentPhase();
@@ -321,6 +321,7 @@ public abstract class Worker<T extends BenchmarkModule> implements Runnable {
 
             long end = System.nanoTime();
             postState = wrkldState.getGlobalState();
+            postPhase = wrkldState.getCurrentPhase();
 
             switch (postState) {
                 case MEASURE:
@@ -329,7 +330,8 @@ public abstract class Worker<T extends BenchmarkModule> implements Runnable {
                     // changed, otherwise we're recording results for a query
                     // that either started during the warmup phase or ended
                     // after the timer went off.
-                    if (preState == State.MEASURE && type != null && this.wrkldState.getCurrentPhase().id == phase.id) {
+                    if (preState == State.MEASURE && type != null &&
+                        postPhase != null && postPhase.id == phase.id) {
                         latencies.addLatency(type.getId(), start, end, this.id, phase.id);
                         intervalRequests.incrementAndGet();
                     }
@@ -419,8 +421,6 @@ public abstract class Worker<T extends BenchmarkModule> implements Runnable {
                                                ex.getClass().getSimpleName(), next, this.toString(),
                                                ex.getMessage(), ex.getErrorCode(), ex.getSQLState()), ex);
 
-                    this.txnErrors.put(next);
-
 		    if (this.wrkld.getDBType().shouldUseTransactions()) {
 			if (savepoint != null) {
 			    this.conn.rollback(savepoint);
@@ -436,9 +436,11 @@ public abstract class Worker<T extends BenchmarkModule> implements Runnable {
                     // ------------------
                     } else if (ex.getErrorCode() == 1213 && ex.getSQLState().equals("40001")) {
                         // MySQLTransactionRollbackException
+                        status = TransactionStatus.RETRY;
                         continue;
                     } else if (ex.getErrorCode() == 1205 && ex.getSQLState().equals("41000")) {
                         // MySQL Lock timeout
+                        status = TransactionStatus.RETRY;
                         continue;
                         
                     // ------------------
@@ -446,6 +448,7 @@ public abstract class Worker<T extends BenchmarkModule> implements Runnable {
                     // ------------------
                     } else if (ex.getErrorCode() == 1205 && ex.getSQLState().equals("40001")) {
                         // SQLServerException Deadlock
+                        status = TransactionStatus.RETRY;
                         continue;
                     
                     // ------------------
@@ -453,6 +456,7 @@ public abstract class Worker<T extends BenchmarkModule> implements Runnable {
                     // ------------------
                     } else if (ex.getErrorCode() == 0 && ex.getSQLState() != null && ex.getSQLState().equals("40001")) {
                         // Postgres serialization
+                        status = TransactionStatus.RETRY;
                         continue;
                     } else if (ex.getErrorCode() == 0 && ex.getSQLState() != null && ex.getSQLState().equals("53200")) {
                         // Postgres OOM error
@@ -466,6 +470,7 @@ public abstract class Worker<T extends BenchmarkModule> implements Runnable {
                     // ------------------
                     } else if (ex.getErrorCode() == 8177 && ex.getSQLState().equals("72000")) {
                         // ORA-08177: Oracle Serialization
+                        status = TransactionStatus.RETRY;
                         continue;
                         
                     // ------------------
@@ -473,6 +478,7 @@ public abstract class Worker<T extends BenchmarkModule> implements Runnable {
                     // ------------------
                     } else if (ex.getErrorCode() == -911 && ex.getSQLState().equals("40001")) {
                         // DB2Exception Deadlock
+                        status = TransactionStatus.RETRY;
                         continue;
                     } else if ((ex.getErrorCode() == 0 && ex.getSQLState().equals("57014")) ||
                                (ex.getErrorCode() == -952 && ex.getSQLState().equals("57014"))) {
@@ -502,7 +508,7 @@ public abstract class Worker<T extends BenchmarkModule> implements Runnable {
                     LOG.error("Fatal error when invoking " + next, ex);
                     throw ex;
                  // Random Error
-                } catch (Exception ex) {
+                } catch (Throwable ex) {
                     LOG.error("Fatal error when invoking " + next, ex);
                     throw new RuntimeException(ex);
                     
@@ -515,13 +521,15 @@ public abstract class Worker<T extends BenchmarkModule> implements Runnable {
                             this.txnSuccess.put(next);
                             break;
                         case RETRY_DIFFERENT:
+                        case RETRY:
                             this.txnRetry.put(next);
-                            return null;
+                            break;
                         case USER_ABORTED:
                             this.txnAbort.put(next);
                             break;
-                        case RETRY:
-                            continue;
+                        case UNKNOWN:
+                            this.txnErrors.put(next);
+                            break;
                         default:
                             assert (false) : String.format("Unexpected status '%s' for %s", status, next);
                     } // SWITCH
@@ -537,7 +545,7 @@ public abstract class Worker<T extends BenchmarkModule> implements Runnable {
             // This *does not* incorrectly inflate our performance numbers.
             // It's more of a workaround for now until I can figure out how to do
             // this correctly in JDBC.
-            if (dbType == DatabaseType.PELOTON) {
+            if (dbType == DatabaseType.NOISEPAGE) {
                 msg += "\nBut we are not stopping because " + dbType + " cannot handle this correctly";
                 LOG.warn(msg);
             } else {

@@ -21,7 +21,7 @@
 	<dependencies>
       <!-- JDBC Drivers -->
 		<dependency org="org.xerial" name="sqlite-jdbc" rev="3.6.20" force="true" conf="test->compile(*),runtime(*),master(*)"/>
-		<dependency org="org.postgresql" name="postgresql" rev="9.4.1209" force="true" conf="compile->compile(*),master(*);runtime->runtime(*)"/>
+		<dependency org="org.postgresql" name="postgresql" rev="42.2.9" force="true" conf="compile->compile(*),master(*);runtime->runtime(*)"/>
 		<dependency org="mysql" name="mysql-connector-java" rev="5.1.47"/>
 		<dependency org="org.hsqldb" name="hsqldb" rev="2.4.1" force="true" conf="compile->compile(*),master(*);runtime->runtime(*)"/>
 	
@@ -29,9 +29,9 @@
 
       <!-- Core Libraries -->
 		<dependency org="junit" name="junit" rev="4.11" force="true" conf="test->compile(*),runtime(*),master(*)"/>
-		<dependency org="org.apache.httpcomponents" name="httpclient" rev="4.3.1" force="true" conf="compile->compile(*),master(*);runtime->runtime(*)"/>
-		<dependency org="org.apache.httpcomponents" name="httpcore" rev="4.3.1" force="true" conf="compile->compile(*),master(*);runtime->runtime(*)"/>
-		<dependency org="org.apache.httpcomponents" name="httpmime" rev="4.3.1" force="true" conf="compile->compile(*),master(*);runtime->runtime(*)"/>
+		<dependency org="org.apache.httpcomponents" name="httpclient" rev="4.3" force="true" conf="compile->compile(*),master(*);runtime->runtime(*)"/>
+		<dependency org="org.apache.httpcomponents" name="httpcore" rev="4.3" force="true" conf="compile->compile(*),master(*);runtime->runtime(*)"/>
+		<dependency org="org.apache.httpcomponents" name="httpmime" rev="4.3" force="true" conf="compile->compile(*),master(*);runtime->runtime(*)"/>
 		<dependency org="log4j" name="log4j" rev="1.2.17" force="true" conf="compile->compile(*),master(*);runtime->runtime(*)"/>
 		<dependency org="commons-collections" name="commons-collections" rev="3.2.1" force="true" conf="compile->compile(*),master(*);runtime->runtime(*)"/>
 		<dependency org="net.sourceforge.collections" name="collections-generic" rev="4.01" force="true" conf="compile->compile(*),master(*);runtime->runtime(*)"/>

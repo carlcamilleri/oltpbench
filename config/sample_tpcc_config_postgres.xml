@@ -4,9 +4,9 @@
     <!-- Connection details -->
     <dbtype>postgres</dbtype>
     <driver>org.postgresql.Driver</driver>
-    <DBUrl>jdbc:postgresql://localhost:5432/chbench</DBUrl>
+    <DBUrl>jdbc:postgresql://localhost:5432/tpc_c</DBUrl>
     <username>postgres</username>
-    <password>postgres</password>
+    <password>camill3ri</password>
     <isolation>TRANSACTION_READ_COMMITTED</isolation>
     <uploadCode></uploadCode>
 

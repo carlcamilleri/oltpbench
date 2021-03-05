@@ -4,9 +4,9 @@
     <!-- Connection details -->
     <dbtype>VERTICA</dbtype>
     <driver>com.vertica.jdbc.Driver</driver>
-    <DBUrl>jdbc:vertica://35.195.255.187:5433/vdb</DBUrl>
+    <DBUrl>jdbc:vertica://104.199.43.168:5433/vdb</DBUrl>
     <username>dbadmin</username>
-    <password>qYkzVk8KPK</password>
+    <password>hDw1zjvKY1</password>
   
 
     <!-- Scale factor is the number of warehouses in TPCC -->
