@@ -69,7 +69,8 @@ public class TPCCBenchmark extends BenchmarkModule {
 
 	protected ArrayList<TPCCWorker> createTerminals() throws SQLException {
 
-		TPCCWorker[] terminals = new TPCCWorker[workConf.getTerminals()];
+		TPCCWorker[] terminals=new TPCCWorker[workConf.getTerminals()];
+
 
 		int numWarehouses = (int) workConf.getScaleFactor();//tpccConf.getNumWarehouses();
 		if (numWarehouses <= 0) {
@@ -119,7 +120,7 @@ public class TPCCBenchmark extends BenchmarkModule {
 				}
 				lowerDistrictId += 1;
 
-				TPCCWorker terminal = new TPCCWorker(this, workerId++,
+				TPCCWorker terminal = TPCCWorkerFactory.createWorker(this, workerId++,
 						w_id, lowerDistrictId, upperDistrictId,
 						numWarehouses);
 				terminals[lowerTerminalId + terminalId] = terminal;

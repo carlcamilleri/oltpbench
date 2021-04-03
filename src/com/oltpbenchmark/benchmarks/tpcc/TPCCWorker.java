@@ -28,6 +28,7 @@ package com.oltpbenchmark.benchmarks.tpcc;
 import java.sql.SQLException;
 import java.util.Random;
 
+import com.oltpbenchmark.WorkloadConfiguration;
 import org.apache.log4j.Logger;
 
 import com.oltpbenchmark.api.Procedure.UserAbortException;
@@ -40,16 +41,16 @@ public class TPCCWorker extends Worker<TPCCBenchmark> {
 
     private static final Logger LOG = Logger.getLogger(TPCCWorker.class);
 
-	private final int terminalWarehouseID;
+	protected final int terminalWarehouseID;
 	/** Forms a range [lower, upper] (inclusive). */
-	private final int terminalDistrictLowerID;
-	private final int terminalDistrictUpperID;
+	protected final int terminalDistrictLowerID;
+	protected final int terminalDistrictUpperID;
 	// private boolean debugMessages;
-	private final Random gen = new Random();
+	protected final Random gen = new Random();
 
-	private int numWarehouses;
+	protected int numWarehouses;
 
-	public TPCCWorker(TPCCBenchmark benchmarkModule, int id,
+	protected TPCCWorker(TPCCBenchmark benchmarkModule, int id,
 			int terminalWarehouseID, int terminalDistrictLowerID,
 			int terminalDistrictUpperID, int numWarehouses)
 			throws SQLException {

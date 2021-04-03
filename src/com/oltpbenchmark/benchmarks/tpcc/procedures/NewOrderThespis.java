@@ -16,36 +16,36 @@
 
 package com.oltpbenchmark.benchmarks.tpcc.procedures;
 
+import com.oltpbenchmark.api.Procedure;
+import com.oltpbenchmark.api.RESTStmt;
+import com.oltpbenchmark.api.SQLStmt;
+import com.oltpbenchmark.benchmarks.tpcc.TPCCConfig;
+import com.oltpbenchmark.benchmarks.tpcc.TPCCConstants;
+import com.oltpbenchmark.benchmarks.tpcc.TPCCUtil;
+import com.oltpbenchmark.benchmarks.tpcc.TPCCWorker;
+import org.apache.log4j.Logger;
+
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Random;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutionException;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
-import org.apache.log4j.Logger;
+public class NewOrderThespis extends TPCCProcedure {
 
-import com.oltpbenchmark.api.SQLStmt;
-import com.oltpbenchmark.benchmarks.tpcc.TPCCConstants;
-import com.oltpbenchmark.benchmarks.tpcc.TPCCUtil;
-import com.oltpbenchmark.benchmarks.tpcc.TPCCWorker;
-import com.oltpbenchmark.benchmarks.tpcc.TPCCConfig;
+    private static final Logger LOG = Logger.getLogger(NewOrderThespis.class);
 
-public class NewOrder extends TPCCProcedure {
 
-    private static final Logger LOG = Logger.getLogger(NewOrder.class);
+    public final RESTStmt stmtGetCustURI = new RESTStmt(
+    		"http://localhost:5000/api/query/select/tpc_c/"+TPCCConstants.TABLENAME_CUSTOMER +"?w=c_w_id:[0]%20AND%20c_d_id:[1]%20AND%20c_id:[2]");
 
-    public final SQLStmt stmtGetCustSQL = new SQLStmt(
-    		"SELECT C_DISCOUNT, C_LAST, C_CREDIT" +
-	        "  FROM " + TPCCConstants.TABLENAME_CUSTOMER + 
-	        " WHERE C_W_ID = ? " + 
-	        "   AND C_D_ID = ? " +
-	        "   AND C_ID = ?");
+	public final RESTStmt stmtGetWhseURI = new RESTStmt(
+			"http://localhost:5000/api/query/select/tpc_c/"+TPCCConstants.TABLENAME_WAREHOUSE +"?w=w_id:[0]");
 
-    public final SQLStmt stmtGetWhseSQL = new SQLStmt(
-    		"SELECT W_TAX " + 
-		    "  FROM " + TPCCConstants.TABLENAME_WAREHOUSE + 
-		    " WHERE W_ID = ?");
-    
     public final SQLStmt stmtGetDistSQL = new SQLStmt(
     		"SELECT D_NEXT_O_ID, D_TAX " +
 	        "  FROM " + TPCCConstants.TABLENAME_DISTRICT +
@@ -95,7 +95,7 @@ public class NewOrder extends TPCCProcedure {
 
 
 	// NewOrder Txn
-	private PreparedStatement stmtGetCust = null;
+
 	private PreparedStatement stmtGetWhse = null;
 	private PreparedStatement stmtGetDist = null;
 	private PreparedStatement stmtInsertNewOrder = null;
@@ -115,16 +115,16 @@ public class NewOrder extends TPCCProcedure {
 
 
 		//initializing all prepared statements
-		stmtGetCust=this.getPreparedStatement(conn, stmtGetCustSQL);
-		stmtGetWhse=this.getPreparedStatement(conn, stmtGetWhseSQL);
-		stmtGetDist=this.getPreparedStatement(conn, stmtGetDistSQL);
-		stmtInsertNewOrder=this.getPreparedStatement(conn, stmtInsertNewOrderSQL);
-		stmtUpdateDist =this.getPreparedStatement(conn, stmtUpdateDistSQL);
-		stmtInsertOOrder =this.getPreparedStatement(conn, stmtInsertOOrderSQL);
-		stmtGetItem =this.getPreparedStatement(conn, stmtGetItemSQL);
-		stmtGetStock =this.getPreparedStatement(conn, stmtGetStockSQL);
-		stmtUpdateStock =this.getPreparedStatement(conn, stmtUpdateStockSQL);
-		stmtInsertOrderLine =this.getPreparedStatement(conn, stmtInsertOrderLineSQL);
+		//stmtGetCust=this.getPreparedStatement(conn, stmtGetCustSQL);
+//		stmtGetWhse=this.getPreparedStatement(conn, stmtGetWhseSQL);
+//		stmtGetDist=this.getPreparedStatement(conn, stmtGetDistSQL);
+//		stmtInsertNewOrder=this.getPreparedStatement(conn, stmtInsertNewOrderSQL);
+//		stmtUpdateDist =this.getPreparedStatement(conn, stmtUpdateDistSQL);
+//		stmtInsertOOrder =this.getPreparedStatement(conn, stmtInsertOOrderSQL);
+//		stmtGetItem =this.getPreparedStatement(conn, stmtGetItemSQL);
+//		stmtGetStock =this.getPreparedStatement(conn, stmtGetStockSQL);
+//		stmtUpdateStock =this.getPreparedStatement(conn, stmtUpdateStockSQL);
+//		stmtInsertOrderLine =this.getPreparedStatement(conn, stmtInsertOrderLineSQL);
 
 
 		int districtID = TPCCUtil.randomNumber(terminalDistrictLowerID,terminalDistrictUpperID, gen);
@@ -184,220 +184,239 @@ public class NewOrder extends TPCCProcedure {
 		float ol_amount, total_amount = 0;
 		
 		try {
-			stmtGetCust.setInt(1, w_id);
-			stmtGetCust.setInt(2, d_id);
-			stmtGetCust.setInt(3, c_id);
-			ResultSet rs = stmtGetCust.executeQuery();
-			if (!rs.next())
-				throw new RuntimeException("C_D_ID=" + d_id
-						+ " C_ID=" + c_id + " not found!");
-			c_discount = rs.getFloat("C_DISCOUNT");
-			c_last = rs.getString("C_LAST");
-			c_credit = rs.getString("C_CREDIT");
-			rs.close();
-			rs = null;
-
-			stmtGetWhse.setInt(1, w_id);
-			rs = stmtGetWhse.executeQuery();
-			if (!rs.next())
-				throw new RuntimeException("W_ID=" + w_id + " not found!");
-			w_tax = rs.getFloat("W_TAX");
-			rs.close();
-			rs = null;
-
-			stmtGetDist.setInt(1, w_id);
-			stmtGetDist.setInt(2, d_id);
-			rs = stmtGetDist.executeQuery();
-			if (!rs.next()) {
-				throw new RuntimeException("D_ID=" + d_id + " D_W_ID=" + w_id
-						+ " not found!");
-			}
-			d_next_o_id = rs.getInt("D_NEXT_O_ID");
-			d_tax = rs.getFloat("D_TAX");
-			rs.close();
-			rs = null;
-
-			//woonhak, need to change order because of foreign key constraints
-			//update next_order_id first, but it might doesn't matter
-			stmtUpdateDist.setInt(1, w_id);
-			stmtUpdateDist.setInt(2, d_id);
-			int result = stmtUpdateDist.executeUpdate();
-			if (result == 0)
-				throw new RuntimeException(
-						"Error!! Cannot update next_order_id on district for D_ID="
-								+ d_id + " D_W_ID=" + w_id);
-
-			o_id = d_next_o_id;
-
-			// woonhak, need to change order, because of foreign key constraints
-			//[[insert ooder first
-			stmtInsertOOrder.setInt(1, o_id);
-			stmtInsertOOrder.setInt(2, d_id);
-			stmtInsertOOrder.setInt(3, w_id);
-			stmtInsertOOrder.setInt(4, c_id);
-			stmtInsertOOrder.setTimestamp(5, w.getBenchmarkModule().getTimestamp(System.currentTimeMillis()));
-			stmtInsertOOrder.setInt(6, o_ol_cnt);
-			stmtInsertOOrder.setInt(7, o_all_local);
-			stmtInsertOOrder.executeUpdate();
-			//insert ooder first]]
-			/*TODO: add error checking */
-
-			stmtInsertNewOrder.setInt(1, o_id);
-			stmtInsertNewOrder.setInt(2, d_id);
-			stmtInsertNewOrder.setInt(3, w_id);
-			stmtInsertNewOrder.executeUpdate();
-			/*TODO: add error checking */
 
 
-			/* woonhak, [[change order				 
-			stmtInsertOOrder.setInt(1, o_id);
-			stmtInsertOOrder.setInt(2, d_id);
-			stmtInsertOOrder.setInt(3, w_id);
-			stmtInsertOOrder.setInt(4, c_id);
-			stmtInsertOOrder.setTimestamp(5,
-					new Timestamp(System.currentTimeMillis()));
-			stmtInsertOOrder.setInt(6, o_ol_cnt);
-			stmtInsertOOrder.setInt(7, o_all_local);
-			stmtInsertOOrder.executeUpdate();
-			change order]]*/
 
-			for (int ol_number = 1; ol_number <= o_ol_cnt; ol_number++) {
-				ol_supply_w_id = supplierWarehouseIDs[ol_number - 1];
-				ol_i_id = itemIDs[ol_number - 1];
-				ol_quantity = orderQuantities[ol_number - 1];
-				stmtGetItem.setInt(1, ol_i_id);
-				rs = stmtGetItem.executeQuery();
-				if (!rs.next()) {
-					// This is (hopefully) an expected error: this is an
-					// expected new order rollback
-					assert ol_number == o_ol_cnt;
-					assert ol_i_id == TPCCConfig.INVALID_ITEM_ID;
-					rs.close();
-					throw new UserAbortException(
-							"EXPECTED new order rollback: I_ID=" + ol_i_id
-									+ " not found!");
+			var futGetCust = stmtGetCustURI.execute(String.valueOf(w_id),String.valueOf(d_id),String.valueOf(c_id));
+
+
+			var futGetWhse = stmtGetWhseURI.execute(String.valueOf(w_id));
+
+			var results = Stream.of(futGetCust,futGetWhse).map(x-> {
+				try {
+					return x.get();
+				} catch (InterruptedException e) {
+					throw new RuntimeException(e.getMessage());
+
+				} catch (ExecutionException e) {
+					throw new RuntimeException(e.getMessage());
 				}
 
-				i_price = rs.getFloat("I_PRICE");
-				i_name = rs.getString("I_NAME");
-				i_data = rs.getString("I_DATA");
-				rs.close();
-				rs = null;
+			}).collect(Collectors.toList());
 
-				itemPrices[ol_number - 1] = i_price;
-				itemNames[ol_number - 1] = i_name;
+			//Stream.of(results).forEach(r->LOG.info(r));
 
 
-				stmtGetStock.setInt(1, ol_i_id);
-				stmtGetStock.setInt(2, ol_supply_w_id);
-				rs = stmtGetStock.executeQuery();
-				if (!rs.next())
-					throw new RuntimeException("I_ID=" + ol_i_id
-							+ " not found!");
-				s_quantity = rs.getInt("S_QUANTITY");
-				s_data = rs.getString("S_DATA");
-				s_dist_01 = rs.getString("S_DIST_01");
-				s_dist_02 = rs.getString("S_DIST_02");
-				s_dist_03 = rs.getString("S_DIST_03");
-				s_dist_04 = rs.getString("S_DIST_04");
-				s_dist_05 = rs.getString("S_DIST_05");
-				s_dist_06 = rs.getString("S_DIST_06");
-				s_dist_07 = rs.getString("S_DIST_07");
-				s_dist_08 = rs.getString("S_DIST_08");
-				s_dist_09 = rs.getString("S_DIST_09");
-				s_dist_10 = rs.getString("S_DIST_10");
-				rs.close();
-				rs = null;
-
-				stockQuantities[ol_number - 1] = s_quantity;
-
-				if (s_quantity - ol_quantity >= 10) {
-					s_quantity -= ol_quantity;
-				} else {
-					s_quantity += -ol_quantity + 91;
-				}
-
-				if (ol_supply_w_id == w_id) {
-					s_remote_cnt_increment = 0;
-				} else {
-					s_remote_cnt_increment = 1;
-				}
-
-
-				stmtUpdateStock.setInt(1, s_quantity);
-				stmtUpdateStock.setInt(2, ol_quantity);
-				stmtUpdateStock.setInt(3, s_remote_cnt_increment);
-				stmtUpdateStock.setInt(4, ol_i_id);
-				stmtUpdateStock.setInt(5, ol_supply_w_id);
-				stmtUpdateStock.addBatch();
-
-				ol_amount = ol_quantity * i_price;
-				orderLineAmounts[ol_number - 1] = ol_amount;
-				total_amount += ol_amount;
-
-				if (i_data.indexOf("ORIGINAL") != -1
-						&& s_data.indexOf("ORIGINAL") != -1) {
-					brandGeneric[ol_number - 1] = 'B';
-				} else {
-					brandGeneric[ol_number - 1] = 'G';
-				}
-
-				switch ((int) d_id) {
-				case 1:
-					ol_dist_info = s_dist_01;
-					break;
-				case 2:
-					ol_dist_info = s_dist_02;
-					break;
-				case 3:
-					ol_dist_info = s_dist_03;
-					break;
-				case 4:
-					ol_dist_info = s_dist_04;
-					break;
-				case 5:
-					ol_dist_info = s_dist_05;
-					break;
-				case 6:
-					ol_dist_info = s_dist_06;
-					break;
-				case 7:
-					ol_dist_info = s_dist_07;
-					break;
-				case 8:
-					ol_dist_info = s_dist_08;
-					break;
-				case 9:
-					ol_dist_info = s_dist_09;
-					break;
-				case 10:
-					ol_dist_info = s_dist_10;
-					break;
-				}
-
-				stmtInsertOrderLine.setInt(1, o_id);
-				stmtInsertOrderLine.setInt(2, d_id);
-				stmtInsertOrderLine.setInt(3, w_id);
-				stmtInsertOrderLine.setInt(4, ol_number);
-				stmtInsertOrderLine.setInt(5, ol_i_id);
-				stmtInsertOrderLine.setInt(6, ol_supply_w_id);
-				stmtInsertOrderLine.setInt(7, ol_quantity);
-				stmtInsertOrderLine.setDouble(8, ol_amount);
-				stmtInsertOrderLine.setString(9, ol_dist_info);
-				stmtInsertOrderLine.addBatch();
-
-			} // end-for
-
-			stmtInsertOrderLine.executeBatch();
-			stmtUpdateStock.executeBatch();
-
-			total_amount *= (1 + w_tax + d_tax) * (1 - c_discount);
-		} catch(UserAbortException userEx)
+//
+//			if (!rs.next())
+//				throw new RuntimeException("C_D_ID=" + d_id
+//						+ " C_ID=" + c_id + " not found!");
+//			c_discount = rs.getFloat("C_DISCOUNT");
+//			c_last = rs.getString("C_LAST");
+//			c_credit = rs.getString("C_CREDIT");
+//			rs.close();
+//			rs = null;
+//
+//			stmtGetWhse.setInt(1, w_id);
+//			rs = stmtGetWhse.executeQuery();
+//			if (!rs.next())
+//				throw new RuntimeException("W_ID=" + w_id + " not found!");
+//			w_tax = rs.getFloat("W_TAX");
+//			rs.close();
+//			rs = null;
+//
+//			stmtGetDist.setInt(1, w_id);
+//			stmtGetDist.setInt(2, d_id);
+//			rs = stmtGetDist.executeQuery();
+//			if (!rs.next()) {
+//				throw new RuntimeException("D_ID=" + d_id + " D_W_ID=" + w_id
+//						+ " not found!");
+//			}
+//			d_next_o_id = rs.getInt("D_NEXT_O_ID");
+//			d_tax = rs.getFloat("D_TAX");
+//			rs.close();
+//			rs = null;
+//
+//			//woonhak, need to change order because of foreign key constraints
+//			//update next_order_id first, but it might doesn't matter
+//			stmtUpdateDist.setInt(1, w_id);
+//			stmtUpdateDist.setInt(2, d_id);
+//			int result = stmtUpdateDist.executeUpdate();
+//			if (result == 0)
+//				throw new RuntimeException(
+//						"Error!! Cannot update next_order_id on district for D_ID="
+//								+ d_id + " D_W_ID=" + w_id);
+//
+//			o_id = d_next_o_id;
+//
+//			// woonhak, need to change order, because of foreign key constraints
+//			//[[insert ooder first
+//			stmtInsertOOrder.setInt(1, o_id);
+//			stmtInsertOOrder.setInt(2, d_id);
+//			stmtInsertOOrder.setInt(3, w_id);
+//			stmtInsertOOrder.setInt(4, c_id);
+//			stmtInsertOOrder.setTimestamp(5, w.getBenchmarkModule().getTimestamp(System.currentTimeMillis()));
+//			stmtInsertOOrder.setInt(6, o_ol_cnt);
+//			stmtInsertOOrder.setInt(7, o_all_local);
+//			stmtInsertOOrder.executeUpdate();
+//			//insert ooder first]]
+//			/*TODO: add error checking */
+//
+//			stmtInsertNewOrder.setInt(1, o_id);
+//			stmtInsertNewOrder.setInt(2, d_id);
+//			stmtInsertNewOrder.setInt(3, w_id);
+//			stmtInsertNewOrder.executeUpdate();
+//			/*TODO: add error checking */
+//
+//
+//			/* woonhak, [[change order
+//			stmtInsertOOrder.setInt(1, o_id);
+//			stmtInsertOOrder.setInt(2, d_id);
+//			stmtInsertOOrder.setInt(3, w_id);
+//			stmtInsertOOrder.setInt(4, c_id);
+//			stmtInsertOOrder.setTimestamp(5,
+//					new Timestamp(System.currentTimeMillis()));
+//			stmtInsertOOrder.setInt(6, o_ol_cnt);
+//			stmtInsertOOrder.setInt(7, o_all_local);
+//			stmtInsertOOrder.executeUpdate();
+//			change order]]*/
+//
+//			for (int ol_number = 1; ol_number <= o_ol_cnt; ol_number++) {
+//				ol_supply_w_id = supplierWarehouseIDs[ol_number - 1];
+//				ol_i_id = itemIDs[ol_number - 1];
+//				ol_quantity = orderQuantities[ol_number - 1];
+//				stmtGetItem.setInt(1, ol_i_id);
+//				rs = stmtGetItem.executeQuery();
+//				if (!rs.next()) {
+//					// This is (hopefully) an expected error: this is an
+//					// expected new order rollback
+//					assert ol_number == o_ol_cnt;
+//					assert ol_i_id == TPCCConfig.INVALID_ITEM_ID;
+//					rs.close();
+//					throw new UserAbortException(
+//							"EXPECTED new order rollback: I_ID=" + ol_i_id
+//									+ " not found!");
+//				}
+//
+//				i_price = rs.getFloat("I_PRICE");
+//				i_name = rs.getString("I_NAME");
+//				i_data = rs.getString("I_DATA");
+//				rs.close();
+//				rs = null;
+//
+//				itemPrices[ol_number - 1] = i_price;
+//				itemNames[ol_number - 1] = i_name;
+//
+//
+//				stmtGetStock.setInt(1, ol_i_id);
+//				stmtGetStock.setInt(2, ol_supply_w_id);
+//				rs = stmtGetStock.executeQuery();
+//				if (!rs.next())
+//					throw new RuntimeException("I_ID=" + ol_i_id
+//							+ " not found!");
+//				s_quantity = rs.getInt("S_QUANTITY");
+//				s_data = rs.getString("S_DATA");
+//				s_dist_01 = rs.getString("S_DIST_01");
+//				s_dist_02 = rs.getString("S_DIST_02");
+//				s_dist_03 = rs.getString("S_DIST_03");
+//				s_dist_04 = rs.getString("S_DIST_04");
+//				s_dist_05 = rs.getString("S_DIST_05");
+//				s_dist_06 = rs.getString("S_DIST_06");
+//				s_dist_07 = rs.getString("S_DIST_07");
+//				s_dist_08 = rs.getString("S_DIST_08");
+//				s_dist_09 = rs.getString("S_DIST_09");
+//				s_dist_10 = rs.getString("S_DIST_10");
+//				rs.close();
+//				rs = null;
+//
+//				stockQuantities[ol_number - 1] = s_quantity;
+//
+//				if (s_quantity - ol_quantity >= 10) {
+//					s_quantity -= ol_quantity;
+//				} else {
+//					s_quantity += -ol_quantity + 91;
+//				}
+//
+//				if (ol_supply_w_id == w_id) {
+//					s_remote_cnt_increment = 0;
+//				} else {
+//					s_remote_cnt_increment = 1;
+//				}
+//
+//
+//				stmtUpdateStock.setInt(1, s_quantity);
+//				stmtUpdateStock.setInt(2, ol_quantity);
+//				stmtUpdateStock.setInt(3, s_remote_cnt_increment);
+//				stmtUpdateStock.setInt(4, ol_i_id);
+//				stmtUpdateStock.setInt(5, ol_supply_w_id);
+//				stmtUpdateStock.addBatch();
+//
+//				ol_amount = ol_quantity * i_price;
+//				orderLineAmounts[ol_number - 1] = ol_amount;
+//				total_amount += ol_amount;
+//
+//				if (i_data.indexOf("ORIGINAL") != -1
+//						&& s_data.indexOf("ORIGINAL") != -1) {
+//					brandGeneric[ol_number - 1] = 'B';
+//				} else {
+//					brandGeneric[ol_number - 1] = 'G';
+//				}
+//
+//				switch ((int) d_id) {
+//				case 1:
+//					ol_dist_info = s_dist_01;
+//					break;
+//				case 2:
+//					ol_dist_info = s_dist_02;
+//					break;
+//				case 3:
+//					ol_dist_info = s_dist_03;
+//					break;
+//				case 4:
+//					ol_dist_info = s_dist_04;
+//					break;
+//				case 5:
+//					ol_dist_info = s_dist_05;
+//					break;
+//				case 6:
+//					ol_dist_info = s_dist_06;
+//					break;
+//				case 7:
+//					ol_dist_info = s_dist_07;
+//					break;
+//				case 8:
+//					ol_dist_info = s_dist_08;
+//					break;
+//				case 9:
+//					ol_dist_info = s_dist_09;
+//					break;
+//				case 10:
+//					ol_dist_info = s_dist_10;
+//					break;
+//				}
+//
+//				stmtInsertOrderLine.setInt(1, o_id);
+//				stmtInsertOrderLine.setInt(2, d_id);
+//				stmtInsertOrderLine.setInt(3, w_id);
+//				stmtInsertOrderLine.setInt(4, ol_number);
+//				stmtInsertOrderLine.setInt(5, ol_i_id);
+//				stmtInsertOrderLine.setInt(6, ol_supply_w_id);
+//				stmtInsertOrderLine.setInt(7, ol_quantity);
+//				stmtInsertOrderLine.setDouble(8, ol_amount);
+//				stmtInsertOrderLine.setString(9, ol_dist_info);
+//				stmtInsertOrderLine.addBatch();
+//
+//			} // end-for
+//
+//			stmtInsertOrderLine.executeBatch();
+//			stmtUpdateStock.executeBatch();
+//
+//			total_amount *= (1 + w_tax + d_tax) * (1 - c_discount);
+		} catch(Procedure.UserAbortException userEx)
 		{
 		    LOG.debug("Caught an expected error in New Order");
 		    throw userEx;
-		}
-	    finally {
+		}  finally {
             if (stmtInsertOrderLine != null)
                 stmtInsertOrderLine.clearBatch();
               if (stmtUpdateStock != null)

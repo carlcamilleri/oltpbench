@@ -8,7 +8,7 @@
           <factory-entry name="Hibernate-MySQL-server" />
         </datasource-mapping>
         <naming-strategy-map />
-        <deploymentDescriptor name="persistence.xml" url="file://$MODULE_DIR$/src/META-INF/persistence.xml" />
+        <deploymentDescriptor name="persistence.xml" url="file://$MODULE_DIR$/out/production/oltpbench/META-INF/persistence.xml" />
       </configuration>
     </facet>
   </component>

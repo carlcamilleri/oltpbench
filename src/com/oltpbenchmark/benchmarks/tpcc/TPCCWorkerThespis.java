@@ -25,43 +25,30 @@ package com.oltpbenchmark.benchmarks.tpcc;
  *
  */
 
-import java.sql.SQLException;
-import java.util.Random;
-
-import org.apache.log4j.Logger;
-
 import com.oltpbenchmark.api.Procedure.UserAbortException;
 import com.oltpbenchmark.api.TransactionType;
 import com.oltpbenchmark.api.Worker;
 import com.oltpbenchmark.benchmarks.tpcc.procedures.TPCCProcedure;
 import com.oltpbenchmark.types.TransactionStatus;
+import org.apache.log4j.Logger;
 
-public class TPCCWorker extends Worker<TPCCBenchmark> {
+import java.sql.SQLException;
+import java.util.Random;
 
-    private static final Logger LOG = Logger.getLogger(TPCCWorker.class);
+public class TPCCWorkerThespis extends TPCCWorker {
 
-	private final int terminalWarehouseID;
-	/** Forms a range [lower, upper] (inclusive). */
-	private final int terminalDistrictLowerID;
-	private final int terminalDistrictUpperID;
-	// private boolean debugMessages;
+    private static final Logger LOG = Logger.getLogger(TPCCWorkerThespis.class);
+
+
 	private final Random gen = new Random();
 
 	private int numWarehouses;
 
-	public TPCCWorker(TPCCBenchmark benchmarkModule, int id,
-			int terminalWarehouseID, int terminalDistrictLowerID,
-			int terminalDistrictUpperID, int numWarehouses)
+	protected TPCCWorkerThespis(TPCCBenchmark benchmarkModule, int id,
+                             int terminalWarehouseID, int terminalDistrictLowerID,
+                             int terminalDistrictUpperID, int numWarehouses)
 			throws SQLException {
-		super(benchmarkModule, id);
-		
-		this.terminalWarehouseID = terminalWarehouseID;
-		this.terminalDistrictLowerID = terminalDistrictLowerID;
-		this.terminalDistrictUpperID = terminalDistrictUpperID;
-		assert this.terminalDistrictLowerID >= 1;
-		assert this.terminalDistrictUpperID <= TPCCConfig.configDistPerWhse;
-		assert this.terminalDistrictLowerID <= this.terminalDistrictUpperID;
-		this.numWarehouses = numWarehouses;
+		super(benchmarkModule, id,terminalWarehouseID,terminalDistrictLowerID,terminalDistrictUpperID,numWarehouses);
 	}
 
 	/**
@@ -78,7 +65,7 @@ public class TPCCWorker extends Worker<TPCCBenchmark> {
         	LOG.error("We have been invoked with an INVALID transactionType?!");
         	throw new RuntimeException("Bad transaction type = "+ nextTransaction);
 	    }
-        conn.commit();
+
         return (TransactionStatus.SUCCESS);
 	}
 }
