@@ -23,6 +23,8 @@ import com.oltpbenchmark.benchmarks.tpcc.TPCCConfig;
 import com.oltpbenchmark.benchmarks.tpcc.TPCCConstants;
 import com.oltpbenchmark.benchmarks.tpcc.TPCCUtil;
 import com.oltpbenchmark.benchmarks.tpcc.TPCCWorker;
+import com.oltpbenchmark.util.json.JSONException;
+import com.oltpbenchmark.util.json.JSONObject;
 import org.apache.log4j.Logger;
 
 import java.sql.Connection;
@@ -33,6 +35,7 @@ import java.util.Random;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
 public class NewOrderThespis extends TPCCProcedure {
@@ -41,15 +44,18 @@ public class NewOrderThespis extends TPCCProcedure {
 
 
     public final RESTStmt stmtGetCustURI = new RESTStmt(
-    		"http://localhost:5000/api/query/select/tpc_c/"+TPCCConstants.TABLENAME_CUSTOMER +"?w=c_w_id:[0]%20AND%20c_d_id:[1]%20AND%20c_id:[2]");
+    		"http://localhost:5000/api/query/select/tpc_c/"+TPCCConstants.TABLENAME_CUSTOMER +"?w=c_w_id:[0] AND c_d_id:[1] AND c_id:[2]");
 
 	public final RESTStmt stmtGetWhseURI = new RESTStmt(
 			"http://localhost:5000/api/query/select/tpc_c/"+TPCCConstants.TABLENAME_WAREHOUSE +"?w=w_id:[0]");
 
-    public final SQLStmt stmtGetDistSQL = new SQLStmt(
-    		"SELECT D_NEXT_O_ID, D_TAX " +
-	        "  FROM " + TPCCConstants.TABLENAME_DISTRICT +
-	        " WHERE D_W_ID = ? AND D_ID = ? FOR UPDATE");
+	public final RESTStmt stmtGetDistURI = new RESTStmt(
+			"http://localhost:5000/api/query/select/tpc_c/"+TPCCConstants.TABLENAME_DISTRICT +"?w=d_w_id:[0] AND d_id:[1]");
+//
+//    public final SQLStmt stmtGetDistSQL = new SQLStmt(
+//    		"SELECT D_NEXT_O_ID, D_TAX " +
+//	        "  FROM " + TPCCConstants.TABLENAME_DISTRICT +
+//	        " WHERE D_W_ID = ? AND D_ID = ? FOR UPDATE");
 
 	public final SQLStmt  stmtInsertNewOrderSQL = new SQLStmt(
 	        "INSERT INTO " + TPCCConstants.TABLENAME_NEWORDER +
@@ -191,18 +197,67 @@ public class NewOrderThespis extends TPCCProcedure {
 
 
 			var futGetWhse = stmtGetWhseURI.execute(String.valueOf(w_id));
+			var futGetDist = stmtGetDistURI.execute(String.valueOf(w_id),String.valueOf(d_id));
 
-			var results = Stream.of(futGetCust,futGetWhse).map(x-> {
+//			try{
+//				futGetWhse.get();
+//				futGetCust.get();
+//			} catch (InterruptedException e) {
+//					throw new RuntimeException(e.getMessage());
+//
+//				} catch (ExecutionException e) {
+//					throw new RuntimeException(e.getMessage());
+//				}
+
+
+
+
+			var results = Stream.of(futGetCust,futGetWhse,futGetDist).map(x-> {
 				try {
 					return x.get();
-				} catch (InterruptedException e) {
+
+				} catch (InterruptedException | ExecutionException e) {
 					throw new RuntimeException(e.getMessage());
 
-				} catch (ExecutionException e) {
-					throw new RuntimeException(e.getMessage());
 				}
 
-			}).collect(Collectors.toList());
+
+			}
+			).collect(Collectors.toList());
+
+			var resGetCust = results.get(0);
+			var resGetWhse = results.get(1);
+			var resGetDist = results.get(2);
+
+			var jarrGetCust = new JSONObject(resGetCust).getJSONArray("entities");
+			if(jarrGetCust.length()!=1)
+				throw new RuntimeException("Invalid response: "+resGetCust);
+
+			var custObj = jarrGetCust.getJSONObject(0).getJSONObject("data");
+			c_discount = Float.parseFloat(custObj.get("c_discount").toString());
+			c_last = custObj.get("c_last").toString();
+			c_credit = custObj.get("c_credit").toString();
+
+
+			var jarrGetWhse = new JSONObject(resGetWhse).getJSONArray("entities");
+			if(jarrGetWhse.length()!=1)
+				throw new RuntimeException("Invalid response: "+resGetWhse);
+
+			var whseObj = jarrGetWhse.getJSONObject(0).getJSONObject("data");
+			w_tax = Float.parseFloat(whseObj.get("w_tax").toString());
+
+			var jarrGetDist = new JSONObject(resGetDist).getJSONArray("entities");
+			if(jarrGetDist.length()!=1)
+				throw new RuntimeException("Invalid response: "+resGetDist);
+
+			var distObj = jarrGetDist.getJSONObject(0).getJSONObject("data");
+			d_next_o_id = Integer.parseInt(distObj.get("d_next_o_id").toString());
+			d_tax = Float.parseFloat(distObj.get("d_tax").toString());
+
+
+			//			d_next_o_id = rs.getInt("D_NEXT_O_ID");
+//			d_tax = rs.getFloat("D_TAX");
+
 
 			//Stream.of(results).forEach(r->LOG.info(r));
 
@@ -412,10 +467,10 @@ public class NewOrderThespis extends TPCCProcedure {
 //			stmtUpdateStock.executeBatch();
 //
 //			total_amount *= (1 + w_tax + d_tax) * (1 - c_discount);
-		} catch(Procedure.UserAbortException userEx)
+		} catch(Procedure.UserAbortException | JSONException userEx)
 		{
 		    LOG.debug("Caught an expected error in New Order");
-		    throw userEx;
+		    throw new RuntimeException(userEx);
 		}  finally {
             if (stmtInsertOrderLine != null)
                 stmtInsertOrderLine.clearBatch();

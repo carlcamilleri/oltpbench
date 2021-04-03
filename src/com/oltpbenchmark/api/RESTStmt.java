@@ -54,10 +54,12 @@ public final class RESTStmt {
 
     private final String getFinalURI(String... parameters) {
 
+
         this.final_uri=this.orig_uri;
         for(int i=0;i< parameters.length;i++) {
             this.final_uri=this.final_uri.replace("["+i+"]",parameters[i]);
         }
+        this.final_uri=this.final_uri.replace(" ","%20");
         return (this.final_uri);
     }
 
