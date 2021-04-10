@@ -4,7 +4,8 @@
     <!-- Connection details -->
     <dbtype>postgres</dbtype>
     <driver>org.postgresql.Driver</driver>
-    <DBUrl>jdbc:postgresql://35.195.218.115:5432/tpc_c</DBUrl>
+    <!--<DBUrl>jdbc:postgresql://35.195.218.115:5432/tpc_c</DBUrl>-->
+	<DBUrl>jdbc:postgresql://localhost:6432/tpc_c</DBUrl>
     <username>postgres</username>
     <password>HRy4TK*V</password>
     <isolation>TRANSACTION_READ_COMMITTED</isolation>
