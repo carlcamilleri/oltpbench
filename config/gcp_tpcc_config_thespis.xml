@@ -6,7 +6,7 @@
     <driver>org.postgresql.Driver</driver>
     <DBUrl>jdbc:postgresql://localhost:6432/tpc_c</DBUrl>
     <username>postgres</username>
-    <password>camill3ri</password>
+    <password>HRy4TK*V</password>
     <isolation>TRANSACTION_READ_COMMITTED</isolation>
     <uploadCode></uploadCode>
 
