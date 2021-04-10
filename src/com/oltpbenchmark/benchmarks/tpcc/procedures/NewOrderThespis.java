@@ -208,6 +208,7 @@ public class NewOrderThespis extends TPCCProcedure {
 //				} catch (ExecutionException e) {
 //					throw new RuntimeException(e.getMessage());
 //				}
+			CompletableFuture.allOf(futGetCust,futGetWhse,futGetDist).join();
 
 
 
