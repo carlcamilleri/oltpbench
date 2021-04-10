@@ -65,6 +65,7 @@ public final class RESTStmt {
 
     public Future<String> execute(String... parameters){
         this.getFinalURI(parameters);
+        LOG.debug("Calling: "+this.final_uri);
         HttpRequest req = HttpRequest.newBuilder(URI.create(this.final_uri)).GET().build();
 
         CompletableFuture<HttpResponse<String>> response = client.sendAsync(req, HttpResponse.BodyHandlers.ofString());
