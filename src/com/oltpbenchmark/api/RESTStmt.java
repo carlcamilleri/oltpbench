@@ -48,7 +48,7 @@ public final class RESTStmt {
 
      */
     public RESTStmt(String uri) {
-
+        LOG.debug("Initialised: "+uri);
         this.orig_uri = uri;
     }
 
@@ -60,6 +60,7 @@ public final class RESTStmt {
             this.final_uri=this.final_uri.replace("["+i+"]",parameters[i]);
         }
         this.final_uri=this.final_uri.replace(" ","%20");
+        LOG.debug("Resolved: "+this.final_uri);
         return (this.final_uri);
     }
 
