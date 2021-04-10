@@ -191,7 +191,7 @@ public class NewOrderThespis extends TPCCProcedure {
 		
 		try {
 
-
+			LOG.debug("Starting neworder thespis");
 
 			var futGetCust = stmtGetCustURI.execute(String.valueOf(w_id),String.valueOf(d_id),String.valueOf(c_id));
 
