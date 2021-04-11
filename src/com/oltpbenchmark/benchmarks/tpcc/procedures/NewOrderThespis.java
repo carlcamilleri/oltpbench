@@ -226,23 +226,23 @@ public class NewOrderThespis extends TPCCProcedure {
 //
 
 
-			var results = Stream.of(futGetCust,futGetWhse,futGetDist).map(x-> {
-				try {
-					return x.get();
-
-				} catch (InterruptedException | ExecutionException e) {
-					throw new RuntimeException(e.getMessage());
-
-				}
-
-
-			}
-			).collect(Collectors.toList());
-
-			var resGetCust = results.get(0);
-			var resGetWhse = results.get(1);
-			var resGetDist = results.get(2);
+//			var results = Stream.of(futGetCust,futGetWhse,futGetDist).map(x-> {
+//				try {
+//					return x.get();
 //
+//				} catch (InterruptedException | ExecutionException e) {
+//					throw new RuntimeException(e.getMessage());
+//
+//				}
+//
+//
+//			}
+//			).collect(Collectors.toList());
+//
+//			var resGetCust = results.get(0);
+//			var resGetWhse = results.get(1);
+//			var resGetDist = results.get(2);
+////
 //			var jarrGetCust = new JSONObject(resGetCust).getJSONArray("entities");
 //
 //			if(jarrGetCust.length()!=1)
