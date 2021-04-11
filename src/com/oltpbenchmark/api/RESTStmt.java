@@ -137,11 +137,11 @@ public final class RESTStmt {
                 .build();
 
         var call = client.newCall(request);
-//        var response = call.execute();
+        var response = call.execute();
 //        var body = response.body();
 //        var res = body.string();
 //        body.close();
-//        response.close();
+        response.close();
 //        return res;
         return "";
         //return client.newCall(request).execute().body().string();
