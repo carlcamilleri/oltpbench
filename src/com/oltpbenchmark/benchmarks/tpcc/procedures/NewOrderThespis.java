@@ -224,8 +224,8 @@ public class NewOrderThespis extends TPCCProcedure {
 			}
 
 			if(true) {
-				RESTStmt.executeSync("http://10.132.0.21:30002/");
-				RESTStmt.executeSync("http://10.132.0.21:30002/");
+				stmtGetWhseURI.executeSync(new String[]{String.valueOf(w_id)});
+
 
 				return;
 			}
