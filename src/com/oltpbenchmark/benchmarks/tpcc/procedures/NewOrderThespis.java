@@ -194,8 +194,8 @@ public class NewOrderThespis extends TPCCProcedure {
 
 			//var res = RESTStmt.executeSync("http://10.132.0.21:30002/api/query/select/tpc_c/warehouse?w=w_id:1");
 			//var res = RESTStmt.executeSync("http://34.102.181.137/");
-			//var res = RESTStmt.executeSync("http://10.132.0.21:30002/api/query/select/tpc_c/warehouse?w=w_id:1");
-			var res = RESTStmt.execute("http://10.132.0.21:30002/").get();
+			var res = RESTStmt.execute("http://10.132.0.21:30002/api/query/select/tpc_c/warehouse?w=w_id:1").get();
+			//var res = RESTStmt.execute("http://10.132.0.21:30002/").get();
 			//var res = RESTStmt.execute("http://34.102.181.137/api/query/select/tpc_c/warehouse?w=w_id:1");
 			//var strRes = res.join();
 			//LOG.debug(strRes);
