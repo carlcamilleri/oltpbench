@@ -245,24 +245,24 @@ public class NewOrderThespis extends TPCCProcedure {
 //						return stmtGetDistURI.executeSync(String.valueOf(w_id),String.valueOf(d_id));
 //					}, pool);
 
-			var futGetCust = stmtGetCustURI.execute(String.valueOf(w_id),String.valueOf(d_id),String.valueOf(c_id));
+			//var futGetCust = stmtGetCustURI.execute(String.valueOf(w_id),String.valueOf(d_id),String.valueOf(c_id));
 
-			var futGetWhse =stmtGetWhseURI.execute(new String[]{String.valueOf(w_id)});
+			///var futGetWhse =stmtGetWhseURI.execute(new String[]{String.valueOf(w_id)});
 
-			var futGetDist =stmtGetDistURI.execute(String.valueOf(w_id),String.valueOf(d_id));
-
-
-					var results = Stream.of(futGetCust, futGetWhse, futGetDist)
-					.map(CompletableFuture::join).collect(Collectors.toList());
-
-			var resGetCust = results.get(0);
-			var resGetWhse = results.get(1);
-			var resGetDist = results.get(2);
+			//var futGetDist =stmtGetDistURI.execute(String.valueOf(w_id),String.valueOf(d_id));
 
 
-//			var resGetWhse = stmtGetWhseURI.executeSync(new String[]{String.valueOf(w_id)});
-//			var resGetDist = stmtGetDistURI.executeSync(String.valueOf(w_id),String.valueOf(d_id));
-//			var resGetCust = stmtGetCustURI.executeSync(String.valueOf(w_id),String.valueOf(d_id),String.valueOf(c_id));
+//					var results = Stream.of(futGetCust, futGetWhse, futGetDist)
+//					.map(CompletableFuture::join).collect(Collectors.toList());
+//
+//			var resGetCust = results.get(0);
+//			var resGetWhse = results.get(1);
+//			var resGetDist = results.get(2);
+
+
+			var resGetWhse = stmtGetWhseURI.executeSync(new String[]{String.valueOf(w_id)});
+			var resGetDist = stmtGetDistURI.executeSync(String.valueOf(w_id),String.valueOf(d_id));
+			var resGetCust = stmtGetCustURI.executeSync(String.valueOf(w_id),String.valueOf(d_id),String.valueOf(c_id));
 
 
 
