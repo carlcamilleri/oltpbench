@@ -206,7 +206,7 @@ public class NewOrderThespis extends TPCCProcedure {
 //			var futGetCust = stmtGetCustURI.execute(String.valueOf(w_id),String.valueOf(d_id),String.valueOf(c_id));
 //			var futGetWhse = stmtGetWhseURI.execute(new String[]{String.valueOf(w_id)});
 //			var futGetDist = stmtGetDistURI.execute(String.valueOf(w_id),String.valueOf(d_id));
-			if(true) {
+			if(false) {
 				var fut1 =
 						CompletableFuture.supplyAsync(() -> {
 							return RESTStmt.executeSync("http://10.132.0.21:30002/");
@@ -226,7 +226,7 @@ public class NewOrderThespis extends TPCCProcedure {
 			if(false) {
 				stmtGetWhseURI.executeSync(new String[]{String.valueOf(w_id)});
 				stmtGetCustURI.executeSync(String.valueOf(w_id),String.valueOf(d_id),String.valueOf(c_id));
-				//stmtGetDistURI.executeSync(String.valueOf(w_id),String.valueOf(d_id));
+				stmtGetDistURI.executeSync(String.valueOf(w_id),String.valueOf(d_id));
 				return;
 			}
 
