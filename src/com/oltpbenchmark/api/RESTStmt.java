@@ -59,10 +59,11 @@ public final class RESTStmt {
 //            .build();
 
     private static final OkHttpClient client = new OkHttpClient.Builder()
-            .connectTimeout(5, TimeUnit.SECONDS)
+            .connectTimeout(1, TimeUnit.SECONDS)
+            .readTimeout(30, TimeUnit.SECONDS)
             .retryOnConnectionFailure(false)
             .socketFactory(new SocketFactoryTcpNoDelay())
-            .connectionPool(new ConnectionPool(256,5,TimeUnit.SECONDS))
+            .connectionPool(new ConnectionPool(256,60,TimeUnit.SECONDS))
 
 //            .eventListener(new EventListener() {
 //                private long callStartNanos;
@@ -137,12 +138,15 @@ public final class RESTStmt {
                 .build();
 
         var call = client.newCall(request);
-        var response = call.execute();
-        var body = response.body();
+
+        try(var response = call.execute()) {
+            var body = response.code();
 //        var res = body.string();
-        body.close();
-        response.close();
+            //body.close();
+            response.close();
 //        return res;
+        }
+
         return "";
         //return client.newCall(request).execute().body().string();
 
