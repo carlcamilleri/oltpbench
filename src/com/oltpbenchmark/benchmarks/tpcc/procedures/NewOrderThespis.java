@@ -230,22 +230,29 @@ public class NewOrderThespis extends TPCCProcedure {
 				return;
 			}
 
-			var futGetCust =
-					CompletableFuture.supplyAsync(() -> {
-						return stmtGetCustURI.executeSync(String.valueOf(w_id),String.valueOf(d_id),String.valueOf(c_id));
-					}, pool);
+//			var futGetCust =
+//					CompletableFuture.supplyAsync(() -> {
+//						return stmtGetCustURI.executeSync(String.valueOf(w_id),String.valueOf(d_id),String.valueOf(c_id));
+//					}, pool);
+//
+//			var futGetWhse =
+//					CompletableFuture.supplyAsync(() -> {
+//						return stmtGetWhseURI.executeSync(new String[]{String.valueOf(w_id)});
+//					}, pool);
+//
+//			var futGetDist =
+//					CompletableFuture.supplyAsync(() -> {
+//						return stmtGetDistURI.executeSync(String.valueOf(w_id),String.valueOf(d_id));
+//					}, pool);
 
-			var futGetWhse =
-					CompletableFuture.supplyAsync(() -> {
-						return stmtGetWhseURI.executeSync(new String[]{String.valueOf(w_id)});
-					}, pool);
+			var futGetCust = stmtGetCustURI.execute(String.valueOf(w_id),String.valueOf(d_id),String.valueOf(c_id));
 
-			var futGetDist =
-					CompletableFuture.supplyAsync(() -> {
-						return stmtGetDistURI.executeSync(String.valueOf(w_id),String.valueOf(d_id));
-					}, pool);
+			var futGetWhse =stmtGetWhseURI.execute(new String[]{String.valueOf(w_id)});
 
-			var results = Stream.of(futGetCust, futGetWhse, futGetDist)
+			var futGetDist =stmtGetDistURI.execute(String.valueOf(w_id),String.valueOf(d_id));
+
+
+					var results = Stream.of(futGetCust, futGetWhse, futGetDist)
 					.map(CompletableFuture::join).collect(Collectors.toList());
 
 			var resGetCust = results.get(0);
