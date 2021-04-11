@@ -206,6 +206,7 @@ public class NewOrderThespis extends TPCCProcedure {
 
 			var resGetWhse = stmtGetWhseURI.executeSync(new String[]{String.valueOf(w_id)});
 			var resGetDist = stmtGetDistURI.executeSync(String.valueOf(w_id),String.valueOf(d_id));
+			var resGetCust = stmtGetCustURI.executeSync(String.valueOf(w_id),String.valueOf(d_id),String.valueOf(c_id));
 
 //
 //			HttpResponse httpRespGetCust  = futGetCust.get();
