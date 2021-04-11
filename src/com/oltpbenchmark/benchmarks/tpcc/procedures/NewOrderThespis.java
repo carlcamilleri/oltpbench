@@ -201,7 +201,7 @@ public class NewOrderThespis extends TPCCProcedure {
 			//LOG.debug(strRes);
 
 			var futGetCust = stmtGetCustURI.execute(String.valueOf(w_id),String.valueOf(d_id),String.valueOf(c_id));
-			var futGetWhse = stmtGetWhseURI.execute(String.valueOf(w_id));
+			var futGetWhse = stmtGetWhseURI.execute(new String[]{String.valueOf(w_id)});
 			var futGetDist = stmtGetDistURI.execute(String.valueOf(w_id),String.valueOf(d_id));
 
 //
