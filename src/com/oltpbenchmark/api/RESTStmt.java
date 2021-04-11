@@ -102,7 +102,7 @@ public final class RESTStmt {
     private static final Pattern SUBSTITUTION_PATTERN = Pattern.compile("\\?\\?");
 
     private String orig_uri;
-    private String final_uri;
+
 
 
     /**
@@ -120,13 +120,13 @@ public final class RESTStmt {
     private final String getFinalURI(String... parameters) {
 
 
-        this.final_uri=this.orig_uri;
+        var final_uri=this.orig_uri;
         for(int i=0;i< parameters.length;i++) {
-            this.final_uri=this.final_uri.replace("["+i+"]",parameters[i]);
+            final_uri=final_uri.replace("["+i+"]",parameters[i]);
         }
-        this.final_uri=this.final_uri.replace(" ","%20");
-        LOG.debug("Resolved: "+this.final_uri);
-        return (this.final_uri);
+        final_uri=final_uri.replace(" ","%20");
+        LOG.debug("Resolved: "+final_uri);
+        return final_uri;
     }
 
     public static String executeSync(String url) throws IOException {
@@ -153,33 +153,37 @@ public final class RESTStmt {
     }
 
     public static CompletableFuture<String> execute(String url) {
+        try {
+            LOG.debug("Calling: " + url);
 
-        LOG.debug("Calling: " + url);
+            Request request = new Request.Builder()
+                    .url(url)
+                    .build();
 
-        Request request = new Request.Builder()
-                .url(url)
-                .build();
-
-        CompletableFuture<String> future = new CompletableFuture<>();
+            CompletableFuture<String> future = new CompletableFuture<>();
 
 
-        client.newCall(request).enqueue(new Callback() {
-            @Override
-            public void onFailure(Call call, IOException e) {
-                future.completeExceptionally(e);
-            }
-
-            @Override
-            public void onResponse(Call call, Response response) throws IOException {
-                try (ResponseBody responseBody = response.body()) {
-                    if (!response.isSuccessful())
-                        future.completeExceptionally(new IOException("Unexpected code " + response));
-
-                    future.complete(responseBody.string());
+            client.newCall(request).enqueue(new Callback() {
+                @Override
+                public void onFailure(Call call, IOException e) {
+                    future.completeExceptionally(e);
                 }
-            }
-        });
-        return future;
+
+                @Override
+                public void onResponse(Call call, Response response) throws IOException {
+                    try (ResponseBody responseBody = response.body()) {
+                        if (!response.isSuccessful())
+                            future.completeExceptionally(new IOException("Unexpected code " + response));
+
+                        future.complete(responseBody.string());
+                    }
+                }
+            });
+            return future;
+        }
+        catch(Exception ex){
+            throw new RuntimeException("Error calling "+url,ex);
+        }
     }
 
     public CompletableFuture<String> execute(String... parameters) {
@@ -188,13 +192,7 @@ public final class RESTStmt {
 
 
     
-    protected final String getOriginalURI() {
-        return (this.orig_uri);
-    }
 
-    @Override
-    public String toString() {
-        return "URI{" + this.final_uri + "}";
-    }
+
     
 }
