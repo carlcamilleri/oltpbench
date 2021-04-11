@@ -138,9 +138,9 @@ public final class RESTStmt {
 
         var call = client.newCall(request);
         var response = call.execute();
-//        var body = response.body();
+        var body = response.body();
 //        var res = body.string();
-//        body.close();
+        body.close();
         response.close();
 //        return res;
         return "";
