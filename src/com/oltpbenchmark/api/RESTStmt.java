@@ -60,8 +60,8 @@ public final class RESTStmt {
 //            .build();
 
     private static final OkHttpClient client = new OkHttpClient.Builder()
-            .connectTimeout(30, TimeUnit.SECONDS)
-            .readTimeout(30, TimeUnit.SECONDS)
+            .connectTimeout(30, TimeUnit.MINUTES)
+            .readTimeout(30, TimeUnit.MINUTES)
             //.dispatcher(new Dispatcher(Executors.newFixedThreadPool(256)))
             .retryOnConnectionFailure(false)
             .socketFactory(new SocketFactoryTcpNoDelay())
