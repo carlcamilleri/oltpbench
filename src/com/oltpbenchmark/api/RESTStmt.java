@@ -137,12 +137,9 @@ public final class RESTStmt {
                     .url(url)
                     .build();
 
-            CompletableFuture<String> future = new CompletableFuture<>();
-
-
             try(var response = client.newCall(request).execute()) {
 
-                try (ResponseBody responseBody = response.body()) {
+                try (var responseBody = response.body()) {
                     if (!response.isSuccessful())
                         throw new IOException("Unexpected code " + response);
 

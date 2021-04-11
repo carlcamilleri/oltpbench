@@ -248,12 +248,12 @@ public class NewOrderThespis extends TPCCProcedure {
 //			var resGetWhse = results.get(1);
 //			var resGetDist = results.get(2);
 //
-//			var jarrGetCust = new JSONObject(resGetCust).getJSONArray("entities");
-//
-//			if(jarrGetCust.length()!=1)
-//				throw new RuntimeException("Invalid response: "+resGetCust);
-//
-//			var custObj = jarrGetCust.getJSONObject(0).getJSONObject("data");
+			var jarrGetCust = new JSONObject(resGetCust).getJSONArray("entities");
+
+			if(jarrGetCust.length()!=1)
+				throw new RuntimeException("Invalid response: "+resGetCust);
+
+			//var custObj = jarrGetCust.getJSONObject(0).getJSONObject("data");
 //			c_discount = Float.parseFloat(custObj.get("c_discount").toString());
 //			c_last = custObj.get("c_last").toString();
 //			c_credit = custObj.get("c_credit").toString();
@@ -488,7 +488,7 @@ public class NewOrderThespis extends TPCCProcedure {
 //
 //			total_amount *= (1 + w_tax + d_tax) * (1 - c_discount);
 		}// catch(Procedure.UserAbortException | JSONException userEx)
-		catch(UserAbortException userEx)
+		catch(UserAbortException | JSONException userEx)
 		{
 		    LOG.error("Caught an expected error in New Order");
 		    throw new RuntimeException(userEx);
