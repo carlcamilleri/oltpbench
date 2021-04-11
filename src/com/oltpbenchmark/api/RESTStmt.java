@@ -33,6 +33,7 @@ import java.net.URI;
 import java.net.UnknownHostException;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 import java.util.regex.Pattern;
@@ -61,9 +62,11 @@ public final class RESTStmt {
     private static final OkHttpClient client = new OkHttpClient.Builder()
             .connectTimeout(1, TimeUnit.SECONDS)
             .readTimeout(30, TimeUnit.SECONDS)
+            .dispatcher(new Dispatcher(Executors.newFixedThreadPool(256)))
             .retryOnConnectionFailure(false)
             .socketFactory(new SocketFactoryTcpNoDelay())
             .connectionPool(new ConnectionPool(256,60,TimeUnit.SECONDS))
+
 
 //            .eventListener(new EventListener() {
 //                private long callStartNanos;
