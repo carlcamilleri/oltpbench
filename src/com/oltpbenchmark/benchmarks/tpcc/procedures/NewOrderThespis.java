@@ -224,9 +224,9 @@ public class NewOrderThespis extends TPCCProcedure {
 			}
 
 			if(true) {
-				stmtGetWhseURI.executeSync(new String[]{String.valueOf(w_id)});
+				//stmtGetWhseURI.executeSync(new String[]{String.valueOf(w_id)});
 				stmtGetCustURI.executeSync(String.valueOf(w_id),String.valueOf(d_id),String.valueOf(c_id));
-				stmtGetDistURI.executeSync(String.valueOf(w_id),String.valueOf(d_id));
+				//stmtGetDistURI.executeSync(String.valueOf(w_id),String.valueOf(d_id));
 				return;
 			}
 
