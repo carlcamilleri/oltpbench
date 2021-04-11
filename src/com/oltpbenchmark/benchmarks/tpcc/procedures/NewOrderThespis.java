@@ -542,7 +542,7 @@ public class NewOrderThespis extends TPCCProcedure {
 //
 //			total_amount *= (1 + w_tax + d_tax) * (1 - c_discount);
 		}// catch(Procedure.UserAbortException | JSONException userEx)
-		catch(UserAbortException | JSONException userEx)
+		catch(UserAbortException   userEx)
 		{
 		    LOG.error("Caught an expected error in New Order");
 		    throw new RuntimeException(userEx);
