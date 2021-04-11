@@ -18,7 +18,7 @@
     <works>
         <work>
           <time>60</time>
-            <rate>disabled</rate>
+            <rate>unlimited</rate>
           <!--<weights>45,43,4,4,4</weights>-->
             <weights>100</weights>
         </work>
