@@ -17,15 +17,22 @@
 
 package com.oltpbenchmark.api;
 
+
+import com.oltpbenchmark.util.SocketFactoryTcpNoDelay;
+import okhttp3.*;
 import org.apache.log4j.Logger;
 
+import javax.net.SocketFactory;
+import java.io.IOException;
+
+import java.net.InetAddress;
+import java.net.Socket;
 import java.net.URI;
-import java.net.http.HttpClient;
-import java.net.http.HttpRequest;
-import java.net.http.HttpResponse;
+
+import java.net.UnknownHostException;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Future;
-import java.util.regex.Matcher;
+import java.util.concurrent.TimeUnit;
 import java.util.regex.Pattern;
 
 /**
@@ -34,7 +41,27 @@ import java.util.regex.Pattern;
  */
 public final class RESTStmt {
     private static final Logger LOG = Logger.getLogger(RESTStmt.class);
-    private static final HttpClient client = HttpClient.newBuilder().version(HttpClient.Version.HTTP_2).build();
+    //private static final HttpClient client = HttpClient.newBuilder()..version(HttpClient.Version.HTTP_2).build();
+//    private static final SocketConfig socketConfig = SocketConfig.custom()
+//            .setSoKeepAlive(true)
+//            .setTcpNoDelay(true)
+//            .build();
+//    private static final IOReactorConfig reactorConfig = IOReactorConfig.custom()
+//            .setTcpNoDelay(true)
+//            .setIoThreadCount(200)
+//            .setSoReuseAddress(true)
+//            .build();
+//
+//    private static final CloseableHttpAsyncClient httpClient = java.net.http.HttpClient. HttpAsyncClients.custom().
+//            setDefaultIOReactorConfig(reactorConfig)
+//            .build();
+
+    private static final OkHttpClient client = new OkHttpClient.Builder()
+            .connectTimeout(5, TimeUnit.SECONDS)
+            .retryOnConnectionFailure(false)
+            .socketFactory(new SocketFactoryTcpNoDelay())
+            .build();
+
 
     private static final Pattern SUBSTITUTION_PATTERN = Pattern.compile("\\?\\?");
 
@@ -49,6 +76,8 @@ public final class RESTStmt {
      */
     public RESTStmt(String uri) {
         LOG.debug("Initialised: "+uri);
+
+
         this.orig_uri = uri;
     }
 
@@ -64,14 +93,36 @@ public final class RESTStmt {
         return (this.final_uri);
     }
 
-    public CompletableFuture<String> execute(String... parameters){
+    public CompletableFuture<String> execute(String... parameters) {
         this.getFinalURI(parameters);
-        LOG.debug("Calling: "+this.final_uri);
-        HttpRequest req = HttpRequest.newBuilder(URI.create(this.final_uri)).GET().build();
+        LOG.debug("Calling: " + this.final_uri);
 
-        CompletableFuture<HttpResponse<String>> response = client.sendAsync(req, HttpResponse.BodyHandlers.ofString());
-        return response.thenApply(r-> r.body());
+        Request request = new Request.Builder()
+                .url(this.final_uri)
+                .build();
+
+        CompletableFuture<String> future = new CompletableFuture<>();
+
+        client.newCall(request).enqueue(new Callback() {
+            @Override
+            public void onFailure(Call call, IOException e) {
+                future.completeExceptionally(e);
+            }
+
+            @Override
+            public void onResponse(Call call, Response response) throws IOException {
+                try (ResponseBody responseBody = response.body()) {
+                    if (!response.isSuccessful())
+                        future.completeExceptionally(new IOException("Unexpected code " + response));
+
+                    future.complete(responseBody.string());
+                }
+            }
+        });
+        return future;
     }
+
+
     
     protected final String getOriginalURI() {
         return (this.orig_uri);

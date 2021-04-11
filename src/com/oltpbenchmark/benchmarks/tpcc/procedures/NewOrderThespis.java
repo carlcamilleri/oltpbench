@@ -16,7 +16,6 @@
 
 package com.oltpbenchmark.benchmarks.tpcc.procedures;
 
-import com.oltpbenchmark.api.Procedure;
 import com.oltpbenchmark.api.RESTStmt;
 import com.oltpbenchmark.api.SQLStmt;
 import com.oltpbenchmark.benchmarks.tpcc.TPCCConfig;
@@ -35,7 +34,6 @@ import java.util.Random;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 import java.util.stream.Collectors;
-import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
 public class NewOrderThespis extends TPCCProcedure {
@@ -44,13 +42,13 @@ public class NewOrderThespis extends TPCCProcedure {
 
 
     public final RESTStmt stmtGetCustURI = new RESTStmt(
-    		"http://10.132.0.18:30002/api/query/select/tpc_c/"+TPCCConstants.TABLENAME_CUSTOMER +"?w=c_w_id:[0] AND c_d_id:[1] AND c_id:[2]");
+    		"http://localhost:5000/api/query/select/tpc_c/"+TPCCConstants.TABLENAME_CUSTOMER +"?w=c_w_id:[0] AND c_d_id:[1] AND c_id:[2]");
 
 	public final RESTStmt stmtGetWhseURI = new RESTStmt(
-			"http://10.132.0.18:30002/api/query/select/tpc_c/"+TPCCConstants.TABLENAME_WAREHOUSE +"?w=w_id:[0]");
+			"http://localhost:5000/api/query/select/tpc_c/"+TPCCConstants.TABLENAME_WAREHOUSE +"?w=w_id:[0]");
 
 	public final RESTStmt stmtGetDistURI = new RESTStmt(
-			"http://10.132.0.18:30002/api/query/select/tpc_c/"+TPCCConstants.TABLENAME_DISTRICT +"?w=d_w_id:[0] AND d_id:[1]");
+			"http://localhost:5000/api/query/select/tpc_c/"+TPCCConstants.TABLENAME_DISTRICT +"?w=d_w_id:[0] AND d_id:[1]");
 //
 //    public final SQLStmt stmtGetDistSQL = new SQLStmt(
 //    		"SELECT D_NEXT_O_ID, D_TAX " +
@@ -194,23 +192,29 @@ public class NewOrderThespis extends TPCCProcedure {
 			LOG.debug("Starting neworder thespis");
 
 			var futGetCust = stmtGetCustURI.execute(String.valueOf(w_id),String.valueOf(d_id),String.valueOf(c_id));
-
-
 			var futGetWhse = stmtGetWhseURI.execute(String.valueOf(w_id));
 			var futGetDist = stmtGetDistURI.execute(String.valueOf(w_id),String.valueOf(d_id));
 
-//			try{
-//				futGetWhse.get();
-//				futGetCust.get();
-//			} catch (InterruptedException e) {
-//					throw new RuntimeException(e.getMessage());
 //
-//				} catch (ExecutionException e) {
-//					throw new RuntimeException(e.getMessage());
-//				}
+//			HttpResponse httpRespGetCust  = futGetCust.get();
+//			var httpRespGetWhse  = futGetWhse.get();
+//			var httpRespGetDist  = futGetDist.get();
+//
+//			httpRespGetCust.getEntity().getContent()
+//
+////			try{
+////				futGetWhse.get();
+////				futGetCust.get();
+////			} catch (InterruptedException e) {
+////					throw new RuntimeException(e.getMessage());
+////
+////				} catch (ExecutionException e) {
+////					throw new RuntimeException(e.getMessage());
+////				}
 			CompletableFuture.allOf(futGetCust,futGetWhse,futGetDist).join();
 
-
+//
+//
 
 
 			var results = Stream.of(futGetCust,futGetWhse,futGetDist).map(x-> {
@@ -469,7 +473,7 @@ public class NewOrderThespis extends TPCCProcedure {
 //
 //			total_amount *= (1 + w_tax + d_tax) * (1 - c_discount);
 		}// catch(Procedure.UserAbortException | JSONException userEx)
-		catch(Procedure.UserAbortException userEx)
+		catch(UserAbortException userEx)
 		{
 		    LOG.error("Caught an expected error in New Order");
 		    throw new RuntimeException(userEx);

@@ -48,7 +48,7 @@
 		<dependency org="org.hibernate" name="hibernate-annotations" rev="3.5.6-Final" force="true" conf="compile->compile(*),master(*);runtime->runtime(*)"/>
 		<dependency org="commons-jxpath" name="commons-jxpath" rev="1.3" force="true" conf="compile->compile(*),master(*);runtime->runtime(*)"/>
 		<dependency org="commons-io" name="commons-io" rev="2.2" force="true" conf="compile->compile(*),master(*);runtime->runtime(*)"/>
-
+		<dependency org="com.squareup.okhttp3" name="okhttp" rev="4.9.1"/>
       <!-- Javax Stuff -->
 		<dependency org="javax.persistence" name="persistence-api" rev="1.0" force="true" conf="compile->compile(*),master(*);runtime->runtime(*)"/>
 		<dependency org="javax.activation" name="activation" rev="1.1.1"/>
