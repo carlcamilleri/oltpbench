@@ -202,7 +202,7 @@ public class NewOrderThespis extends TPCCProcedure {
 
 			//var futGetCust = stmtGetCustURI.execute(String.valueOf(w_id),String.valueOf(d_id),String.valueOf(c_id));
 			var futGetWhse = stmtGetWhseURI.execute(new String[]{String.valueOf(w_id)});
-			//var futGetDist = stmtGetDistURI.execute(String.valueOf(w_id),String.valueOf(d_id));
+			var futGetDist = stmtGetDistURI.execute(String.valueOf(w_id),String.valueOf(d_id));
 
 //
 //			HttpResponse httpRespGetCust  = futGetCust.get();
@@ -221,7 +221,7 @@ public class NewOrderThespis extends TPCCProcedure {
 ////					throw new RuntimeException(e.getMessage());
 ////				}
 			//CompletableFuture.allOf(futGetCust,futGetWhse,futGetDist).join();
-			CompletableFuture.allOf(futGetWhse).join();
+			CompletableFuture.allOf(futGetWhse,futGetDist).join();
 
 //
 //
