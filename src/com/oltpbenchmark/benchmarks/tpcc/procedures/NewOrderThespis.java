@@ -34,15 +34,18 @@ import java.sql.SQLException;
 import java.util.Random;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 public class NewOrderThespis extends TPCCProcedure {
 
     private static final Logger LOG = Logger.getLogger(NewOrderThespis.class);
+	private static final ExecutorService pool = Executors.newFixedThreadPool(256);
 
 
-    public final RESTStmt stmtGetCustURI = new RESTStmt(
+	public final RESTStmt stmtGetCustURI = new RESTStmt(
     		"http://10.132.0.21:30002/api/query/select/tpc_c/"+TPCCConstants.TABLENAME_CUSTOMER +"?w=c_w_id:[0] AND c_d_id:[1] AND c_id:[2]");
 
 	public final RESTStmt stmtGetWhseURI = new RESTStmt(
@@ -204,16 +207,32 @@ public class NewOrderThespis extends TPCCProcedure {
 //			var futGetWhse = stmtGetWhseURI.execute(new String[]{String.valueOf(w_id)});
 //			var futGetDist = stmtGetDistURI.execute(String.valueOf(w_id),String.valueOf(d_id));
 
-//			var results = Stream.of(futGetCust, futGetWhse, futGetDist)
-//					.map(CompletableFuture::join).collect(Collectors.toList());
-////
-//			var resGetCust = results.get(0);
-//			var resGetWhse = results.get(1);
-//			var resGetDist = results.get(2);
+			var futGetCust =
+					CompletableFuture.supplyAsync(() -> {
+						return stmtGetCustURI.executeSync(String.valueOf(w_id),String.valueOf(d_id),String.valueOf(c_id));
+					}, pool);
+
+			var futGetWhse =
+					CompletableFuture.supplyAsync(() -> {
+						return stmtGetWhseURI.executeSync(new String[]{String.valueOf(w_id)});
+					}, pool);
+
+			var futGetDist =
+					CompletableFuture.supplyAsync(() -> {
+						return stmtGetDistURI.executeSync(String.valueOf(w_id),String.valueOf(d_id));
+					}, pool);
+
+			var results = Stream.of(futGetCust, futGetWhse, futGetDist)
+					.map(CompletableFuture::join).collect(Collectors.toList());
 //
-			var resGetWhse = stmtGetWhseURI.executeSync(new String[]{String.valueOf(w_id)});
-			var resGetDist = stmtGetDistURI.executeSync(String.valueOf(w_id),String.valueOf(d_id));
-			var resGetCust = stmtGetCustURI.executeSync(String.valueOf(w_id),String.valueOf(d_id),String.valueOf(c_id));
+			var resGetCust = results.get(0);
+			var resGetWhse = results.get(1);
+			var resGetDist = results.get(2);
+
+
+//			var resGetWhse = stmtGetWhseURI.executeSync(new String[]{String.valueOf(w_id)});
+//			var resGetDist = stmtGetDistURI.executeSync(String.valueOf(w_id),String.valueOf(d_id));
+//			var resGetCust = stmtGetCustURI.executeSync(String.valueOf(w_id),String.valueOf(d_id),String.valueOf(c_id));
 
 
 
