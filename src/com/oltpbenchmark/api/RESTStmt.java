@@ -129,28 +129,33 @@ public final class RESTStmt {
         return final_uri;
     }
 
-    public static String executeSync(String url) throws IOException {
+    public static String executeSync(String url) {
+        try {
+            LOG.debug("Calling: " + url);
 
-        //LOG.debug("Calling: " + url);
+            Request request = new Request.Builder()
+                    .url(url)
+                    .build();
 
-        Request request = new Request.Builder()
-                .url(url)
-                .build();
+            CompletableFuture<String> future = new CompletableFuture<>();
 
-        var call = client.newCall(request);
 
-        try(var response = call.execute()) {
-            var body = response.code();
-//        var res = body.string();
-            //body.close();
-            response.close();
-//        return res;
+            try(var response = client.newCall(request).execute()) {
+
+                try (ResponseBody responseBody = response.body()) {
+                    if (!response.isSuccessful())
+                        throw new IOException("Unexpected code " + response);
+
+                    return responseBody.string();
+                }
+            }
+
         }
-
-        return "";
-        //return client.newCall(request).execute().body().string();
-
+        catch(Exception ex){
+            throw new RuntimeException("Error calling "+url,ex);
+        }
     }
+
 
     public static CompletableFuture<String> execute(String url) {
         try {
@@ -191,8 +196,16 @@ public final class RESTStmt {
     }
 
 
-    
+    public String executeSync(String... parameters) {
+        return this.executeSync(this.getFinalURI(parameters));
+    }
 
 
-    
+
+
+
+
+
+
+
 }
