@@ -194,15 +194,15 @@ public class NewOrderThespis extends TPCCProcedure {
 
 			//var res = RESTStmt.executeSync("http://10.132.0.21:30002/api/query/select/tpc_c/warehouse?w=w_id:1");
 			//var res = RESTStmt.executeSync("http://34.102.181.137/");
-			var res = RESTStmt.execute("http://10.132.0.21:30002/api/query/select/tpc_c/warehouse?w=w_id:1").get();
+			//var res = RESTStmt.execute("http://10.132.0.21:30002/api/query/select/tpc_c/warehouse?w=w_id:1").get();
 			//var res = RESTStmt.execute("http://10.132.0.21:30002/").get();
 			//var res = RESTStmt.execute("http://34.102.181.137/api/query/select/tpc_c/warehouse?w=w_id:1");
 			//var strRes = res.join();
 			//LOG.debug(strRes);
 
-			//var futGetCust = stmtGetCustURI.execute(String.valueOf(w_id),String.valueOf(d_id),String.valueOf(c_id));
-			//var futGetWhse = stmtGetWhseURI.execute(String.valueOf(w_id));
-			//var futGetDist = stmtGetDistURI.execute(String.valueOf(w_id),String.valueOf(d_id));
+			var futGetCust = stmtGetCustURI.execute(String.valueOf(w_id),String.valueOf(d_id),String.valueOf(c_id));
+			var futGetWhse = stmtGetWhseURI.execute(String.valueOf(w_id));
+			var futGetDist = stmtGetDistURI.execute(String.valueOf(w_id),String.valueOf(d_id));
 
 //
 //			HttpResponse httpRespGetCust  = futGetCust.get();
@@ -220,29 +220,29 @@ public class NewOrderThespis extends TPCCProcedure {
 ////				} catch (ExecutionException e) {
 ////					throw new RuntimeException(e.getMessage());
 ////				}
-			//CompletableFuture.allOf(futGetCust,futGetWhse,futGetDist).join();
+			CompletableFuture.allOf(futGetCust,futGetWhse,futGetDist).join();
 
 //
 //
 
 
-//			var results = Stream.of(futGetCust,futGetWhse,futGetDist).map(x-> {
-//				try {
-//					return x.get();
-//
-//				} catch (InterruptedException | ExecutionException e) {
-//					throw new RuntimeException(e.getMessage());
-//
-//				}
-//
-//
-//			}
-//			).collect(Collectors.toList());
-//
-//			var resGetCust = results.get(0);
-//			var resGetWhse = results.get(1);
-//			var resGetDist = results.get(2);
-//
+			var results = Stream.of(futGetCust,futGetWhse,futGetDist).map(x-> {
+				try {
+					return x.get();
+
+				} catch (InterruptedException | ExecutionException e) {
+					throw new RuntimeException(e.getMessage());
+
+				}
+
+
+			}
+			).collect(Collectors.toList());
+
+			var resGetCust = results.get(0);
+			var resGetWhse = results.get(1);
+			var resGetDist = results.get(2);
+
 //			var jarrGetCust = new JSONObject(resGetCust).getJSONArray("entities");
 //			if(jarrGetCust.length()!=1)
 //				throw new RuntimeException("Invalid response: "+resGetCust);
