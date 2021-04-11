@@ -181,7 +181,7 @@ public class NewOrderThespis extends TPCCProcedure {
 		int d_next_o_id, o_id = -1, s_quantity;
 		String c_last = null, c_credit = null, i_name, i_data, s_data;
 		String s_dist_01, s_dist_02, s_dist_03, s_dist_04, s_dist_05;
-		String s_dist_06, s_dist_07, s_dist_08, s_dist_09, s_dist_10, ol_dist_info = null;
+		String s_dist_06, s_dist_07, s_dist_08, s_dist_09, s_dist_10;
 		float[] itemPrices = new float[o_ol_cnt];
 		float[] orderLineAmounts = new float[o_ol_cnt];
 		String[] itemNames = new String[o_ol_cnt];
@@ -206,6 +206,17 @@ public class NewOrderThespis extends TPCCProcedure {
 //			var futGetCust = stmtGetCustURI.execute(String.valueOf(w_id),String.valueOf(d_id),String.valueOf(c_id));
 //			var futGetWhse = stmtGetWhseURI.execute(new String[]{String.valueOf(w_id)});
 //			var futGetDist = stmtGetDistURI.execute(String.valueOf(w_id),String.valueOf(d_id));
+if(true) {
+	var fut =
+			CompletableFuture.supplyAsync(() -> {
+				return stmtGetCustURI.executeSync("http://10.132.0.21:30002/");
+			}, pool);
+
+	var r = Stream.of(fut)
+			.map(CompletableFuture::join).collect(Collectors.toList());
+
+	return;
+}
 
 			var futGetCust =
 					CompletableFuture.supplyAsync(() -> {
@@ -224,7 +235,7 @@ public class NewOrderThespis extends TPCCProcedure {
 
 			var results = Stream.of(futGetCust, futGetWhse, futGetDist)
 					.map(CompletableFuture::join).collect(Collectors.toList());
-//
+
 			var resGetCust = results.get(0);
 			var resGetWhse = results.get(1);
 			var resGetDist = results.get(2);
