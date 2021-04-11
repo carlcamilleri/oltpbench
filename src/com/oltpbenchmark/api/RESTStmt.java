@@ -21,6 +21,7 @@ package com.oltpbenchmark.api;
 import com.oltpbenchmark.util.SocketFactoryTcpNoDelay;
 import okhttp3.*;
 import org.apache.log4j.Logger;
+import org.jetbrains.annotations.NotNull;
 
 import javax.net.SocketFactory;
 import java.io.IOException;
@@ -30,6 +31,7 @@ import java.net.Socket;
 import java.net.URI;
 
 import java.net.UnknownHostException;
+import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
@@ -60,6 +62,39 @@ public final class RESTStmt {
             .connectTimeout(5, TimeUnit.SECONDS)
             .retryOnConnectionFailure(false)
             .socketFactory(new SocketFactoryTcpNoDelay())
+            .connectionPool(new ConnectionPool(256,5,TimeUnit.SECONDS))
+
+//            .eventListener(new EventListener() {
+//                private long callStartNanos;
+//
+//                private void printEvent(String name) {
+//                    long nowNanos = System.nanoTime();
+//                    if (name.equals("callStart")) {
+//                        callStartNanos = nowNanos;
+//                    }
+//                    long elapsedNanos = nowNanos - callStartNanos;
+//                    System.out.printf("%.3f %s%n", elapsedNanos / 1000000000d, name);
+//                }
+//
+//
+//
+//
+//                @Override public void callStart(Call call) {
+//                    printEvent("callStart");
+//                }
+//
+//                @Override public void callEnd(Call call) {
+//                    printEvent("callEnd");
+//                }
+//
+//                @Override public void dnsStart(Call call, String domainName) {
+//                    printEvent("dnsStart");
+//                }
+//
+//                @Override public void dnsEnd(Call call, String domainName, List<InetAddress> inetAddressList) {
+//                    printEvent("dnsEnd");
+//                }
+//            })
             .build();
 
 
@@ -93,15 +128,35 @@ public final class RESTStmt {
         return (this.final_uri);
     }
 
-    public CompletableFuture<String> execute(String... parameters) {
-        this.getFinalURI(parameters);
-        LOG.debug("Calling: " + this.final_uri);
+    public static String executeSync(String url) throws IOException {
+
+        //LOG.debug("Calling: " + url);
 
         Request request = new Request.Builder()
-                .url(this.final_uri)
+                .url(url)
+                .build();
+
+        var call = client.newCall(request);
+        var response = call.execute();
+        var body = response.body();
+        var res = body.string();
+        body.close();
+        response.close();
+        return res;
+        //return client.newCall(request).execute().body().string();
+
+    }
+
+    public static CompletableFuture<String> execute(String url) {
+
+        LOG.debug("Calling: " + url);
+
+        Request request = new Request.Builder()
+                .url(url)
                 .build();
 
         CompletableFuture<String> future = new CompletableFuture<>();
+
 
         client.newCall(request).enqueue(new Callback() {
             @Override
@@ -120,6 +175,10 @@ public final class RESTStmt {
             }
         });
         return future;
+    }
+
+    public CompletableFuture<String> execute(String... parameters) {
+        return this.execute(this.getFinalURI(parameters));
     }
 
 

@@ -26,6 +26,7 @@ import com.oltpbenchmark.util.json.JSONException;
 import com.oltpbenchmark.util.json.JSONObject;
 import org.apache.log4j.Logger;
 
+import java.io.IOException;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -54,48 +55,48 @@ public class NewOrderThespis extends TPCCProcedure {
 //    		"SELECT D_NEXT_O_ID, D_TAX " +
 //	        "  FROM " + TPCCConstants.TABLENAME_DISTRICT +
 //	        " WHERE D_W_ID = ? AND D_ID = ? FOR UPDATE");
-
-	public final SQLStmt  stmtInsertNewOrderSQL = new SQLStmt(
-	        "INSERT INTO " + TPCCConstants.TABLENAME_NEWORDER +
-	        " (NO_O_ID, NO_D_ID, NO_W_ID) " +
-            " VALUES ( ?, ?, ?)");
-
-	public final SQLStmt  stmtUpdateDistSQL = new SQLStmt(
-	        "UPDATE " + TPCCConstants.TABLENAME_DISTRICT + 
-	        "   SET D_NEXT_O_ID = D_NEXT_O_ID + 1 " +
-            " WHERE D_W_ID = ? " +
-	        "   AND D_ID = ?");
-
-	public final SQLStmt  stmtInsertOOrderSQL = new SQLStmt(
-	        "INSERT INTO " + TPCCConstants.TABLENAME_OPENORDER + 
-	        " (O_ID, O_D_ID, O_W_ID, O_C_ID, O_ENTRY_D, O_OL_CNT, O_ALL_LOCAL)" + 
-            " VALUES (?, ?, ?, ?, ?, ?, ?)");
-
-	public final SQLStmt  stmtGetItemSQL = new SQLStmt(
-	        "SELECT I_PRICE, I_NAME , I_DATA " +
-            "  FROM " + TPCCConstants.TABLENAME_ITEM + 
-            " WHERE I_ID = ?");
-
-	public final SQLStmt  stmtGetStockSQL = new SQLStmt(
-	        "SELECT S_QUANTITY, S_DATA, S_DIST_01, S_DIST_02, S_DIST_03, S_DIST_04, S_DIST_05, " +
-            "       S_DIST_06, S_DIST_07, S_DIST_08, S_DIST_09, S_DIST_10" +
-            "  FROM " + TPCCConstants.TABLENAME_STOCK + 
-            " WHERE S_I_ID = ? " +
-            "   AND S_W_ID = ? FOR UPDATE");
-
-	public final SQLStmt  stmtUpdateStockSQL = new SQLStmt(
-	        "UPDATE " + TPCCConstants.TABLENAME_STOCK + 
-	        "   SET S_QUANTITY = ? , " +
-            "       S_YTD = S_YTD + ?, " + 
-	        "       S_ORDER_CNT = S_ORDER_CNT + 1, " +
-            "       S_REMOTE_CNT = S_REMOTE_CNT + ? " +
-	        " WHERE S_I_ID = ? " +
-            "   AND S_W_ID = ?");
-
-	public final SQLStmt  stmtInsertOrderLineSQL = new SQLStmt(
-	        "INSERT INTO " + TPCCConstants.TABLENAME_ORDERLINE + 
-	        " (OL_O_ID, OL_D_ID, OL_W_ID, OL_NUMBER, OL_I_ID, OL_SUPPLY_W_ID, OL_QUANTITY, OL_AMOUNT, OL_DIST_INFO) " +
-            " VALUES (?,?,?,?,?,?,?,?,?)");
+//
+//	public final SQLStmt  stmtInsertNewOrderSQL = new SQLStmt(
+//	        "INSERT INTO " + TPCCConstants.TABLENAME_NEWORDER +
+//	        " (NO_O_ID, NO_D_ID, NO_W_ID) " +
+//            " VALUES ( ?, ?, ?)");
+//
+//	public final SQLStmt  stmtUpdateDistSQL = new SQLStmt(
+//	        "UPDATE " + TPCCConstants.TABLENAME_DISTRICT +
+//	        "   SET D_NEXT_O_ID = D_NEXT_O_ID + 1 " +
+//            " WHERE D_W_ID = ? " +
+//	        "   AND D_ID = ?");
+//
+//	public final SQLStmt  stmtInsertOOrderSQL = new SQLStmt(
+//	        "INSERT INTO " + TPCCConstants.TABLENAME_OPENORDER +
+//	        " (O_ID, O_D_ID, O_W_ID, O_C_ID, O_ENTRY_D, O_OL_CNT, O_ALL_LOCAL)" +
+//            " VALUES (?, ?, ?, ?, ?, ?, ?)");
+//
+//	public final SQLStmt  stmtGetItemSQL = new SQLStmt(
+//	        "SELECT I_PRICE, I_NAME , I_DATA " +
+//            "  FROM " + TPCCConstants.TABLENAME_ITEM +
+//            " WHERE I_ID = ?");
+//
+//	public final SQLStmt  stmtGetStockSQL = new SQLStmt(
+//	        "SELECT S_QUANTITY, S_DATA, S_DIST_01, S_DIST_02, S_DIST_03, S_DIST_04, S_DIST_05, " +
+//            "       S_DIST_06, S_DIST_07, S_DIST_08, S_DIST_09, S_DIST_10" +
+//            "  FROM " + TPCCConstants.TABLENAME_STOCK +
+//            " WHERE S_I_ID = ? " +
+//            "   AND S_W_ID = ? FOR UPDATE");
+//
+//	public final SQLStmt  stmtUpdateStockSQL = new SQLStmt(
+//	        "UPDATE " + TPCCConstants.TABLENAME_STOCK +
+//	        "   SET S_QUANTITY = ? , " +
+//            "       S_YTD = S_YTD + ?, " +
+//	        "       S_ORDER_CNT = S_ORDER_CNT + 1, " +
+//            "       S_REMOTE_CNT = S_REMOTE_CNT + ? " +
+//	        " WHERE S_I_ID = ? " +
+//            "   AND S_W_ID = ?");
+//
+//	public final SQLStmt  stmtInsertOrderLineSQL = new SQLStmt(
+//	        "INSERT INTO " + TPCCConstants.TABLENAME_ORDERLINE +
+//	        " (OL_O_ID, OL_D_ID, OL_W_ID, OL_NUMBER, OL_I_ID, OL_SUPPLY_W_ID, OL_QUANTITY, OL_AMOUNT, OL_DIST_INFO) " +
+//            " VALUES (?,?,?,?,?,?,?,?,?)");
 
 
 	// NewOrder Txn
@@ -191,9 +192,16 @@ public class NewOrderThespis extends TPCCProcedure {
 
 			LOG.debug("Starting neworder thespis");
 
-			var futGetCust = stmtGetCustURI.execute(String.valueOf(w_id),String.valueOf(d_id),String.valueOf(c_id));
-			var futGetWhse = stmtGetWhseURI.execute(String.valueOf(w_id));
-			var futGetDist = stmtGetDistURI.execute(String.valueOf(w_id),String.valueOf(d_id));
+			//var res = RESTStmt.executeSync("http://10.132.0.21:30002/api/query/select/tpc_c/warehouse?w=w_id:1");
+			//var res = RESTStmt.executeSync("http://34.102.181.137/");
+			var res = RESTStmt.executeSync("http://10.132.0.21:30002/api/query/select/tpc_c/warehouse?w=w_id:1");
+			//var res = RESTStmt.execute("http://34.102.181.137/api/query/select/tpc_c/warehouse?w=w_id:1");
+			//var strRes = res.join();
+			//LOG.debug(strRes);
+
+			//var futGetCust = stmtGetCustURI.execute(String.valueOf(w_id),String.valueOf(d_id),String.valueOf(c_id));
+			//var futGetWhse = stmtGetWhseURI.execute(String.valueOf(w_id));
+			//var futGetDist = stmtGetDistURI.execute(String.valueOf(w_id),String.valueOf(d_id));
 
 //
 //			HttpResponse httpRespGetCust  = futGetCust.get();
@@ -211,28 +219,28 @@ public class NewOrderThespis extends TPCCProcedure {
 ////				} catch (ExecutionException e) {
 ////					throw new RuntimeException(e.getMessage());
 ////				}
-			CompletableFuture.allOf(futGetCust,futGetWhse,futGetDist).join();
+			//CompletableFuture.allOf(futGetCust,futGetWhse,futGetDist).join();
 
 //
 //
 
 
-			var results = Stream.of(futGetCust,futGetWhse,futGetDist).map(x-> {
-				try {
-					return x.get();
-
-				} catch (InterruptedException | ExecutionException e) {
-					throw new RuntimeException(e.getMessage());
-
-				}
-
-
-			}
-			).collect(Collectors.toList());
-
-			var resGetCust = results.get(0);
-			var resGetWhse = results.get(1);
-			var resGetDist = results.get(2);
+//			var results = Stream.of(futGetCust,futGetWhse,futGetDist).map(x-> {
+//				try {
+//					return x.get();
+//
+//				} catch (InterruptedException | ExecutionException e) {
+//					throw new RuntimeException(e.getMessage());
+//
+//				}
+//
+//
+//			}
+//			).collect(Collectors.toList());
+//
+//			var resGetCust = results.get(0);
+//			var resGetWhse = results.get(1);
+//			var resGetDist = results.get(2);
 //
 //			var jarrGetCust = new JSONObject(resGetCust).getJSONArray("entities");
 //			if(jarrGetCust.length()!=1)
@@ -473,7 +481,7 @@ public class NewOrderThespis extends TPCCProcedure {
 //
 //			total_amount *= (1 + w_tax + d_tax) * (1 - c_discount);
 		}// catch(Procedure.UserAbortException | JSONException userEx)
-		catch(UserAbortException userEx)
+		catch(UserAbortException | IOException userEx)
 		{
 		    LOG.error("Caught an expected error in New Order");
 		    throw new RuntimeException(userEx);
