@@ -212,12 +212,12 @@ public class NewOrderThespis extends TPCCProcedure {
 							return RESTStmt.executeSync("http://10.132.0.26:5000/api/query/select/tpc_c/warehouse?w=w_id:1");
 						}, pool);
 
-//				var fut2 =
-//						CompletableFuture.supplyAsync(() -> {
-//							return RESTStmt.executeSync("http://10.132.0.21:30002/");
-//						}, pool);
+				var fut2 =
+						CompletableFuture.supplyAsync(() -> {
+							return RESTStmt.executeSync("http://10.132.0.26:5000/api/query/select/tpc_c/warehouse?w=w_id:1");
+						}, pool);
 
-				var r = Stream.of(fut1)
+				var r = Stream.of(fut1,fut2)
 						.map(CompletableFuture::join).collect(Collectors.toList());
 
 				return;
