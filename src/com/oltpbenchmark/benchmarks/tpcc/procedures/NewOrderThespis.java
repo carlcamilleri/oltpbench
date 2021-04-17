@@ -209,7 +209,7 @@ public class NewOrderThespis extends TPCCProcedure {
 			if(true) {
 				var fut1 =
 						CompletableFuture.supplyAsync(() -> {
-							return RESTStmt.executeSync("http://10.132.0.26:5000/");
+							return RESTStmt.executeSync("http://10.132.0.26:5000/api/query/select/tpc_c/warehouse?w=w_id:1");
 						}, pool);
 
 //				var fut2 =
