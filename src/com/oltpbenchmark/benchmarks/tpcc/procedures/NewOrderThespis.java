@@ -209,17 +209,17 @@ public class NewOrderThespis extends TPCCProcedure {
 			if(true) {
 				var fut1 =
 						CompletableFuture.supplyAsync(() -> {
-							return RESTStmt.executeSync("http://10.132.0.36:5000/");
+							return RESTStmt.executeSync("http://10.132.0.34:30002/");
 						}, pool);
 
 				var fut2 =
 						CompletableFuture.supplyAsync(() -> {
-							return RESTStmt.executeSync("http://10.132.0.36:5000/");
+							return RESTStmt.executeSync("http://10.132.0.35:30002/");
 						}, pool);
 
 				var fut3 =
 						CompletableFuture.supplyAsync(() -> {
-							return RESTStmt.executeSync("http://10.132.0.36:5000/");
+							return RESTStmt.executeSync("http://10.132.0.33:30002/");
 						}, pool);
 
 				var r = Stream.of(fut1,fut2,fut3)
