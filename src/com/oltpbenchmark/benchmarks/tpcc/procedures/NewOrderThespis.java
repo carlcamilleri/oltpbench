@@ -236,7 +236,7 @@ public class NewOrderThespis extends TPCCProcedure {
 				return;
 			}
 
-			if(true) {
+			if(false) {
 				RESTStmt.executeSync("http://10.132.0.36:5000/api/query/select/tpc_c/warehouse?w=w_id:1");
 				RESTStmt.executeSync("http://10.132.0.36:5000/api/query/select/tpc_c/warehouse?w=w_id:1");
 				RESTStmt.executeSync("http://10.132.0.36:5000/api/query/select/tpc_c/warehouse?w=w_id:1");
@@ -244,7 +244,7 @@ public class NewOrderThespis extends TPCCProcedure {
 				return;
 			}
 
-			if(false) {
+			if(true) {
 				stmtGetWhseURI.executeSync(new String[]{String.valueOf(w_id)});
 				stmtGetCustURI.executeSync(String.valueOf(w_id),String.valueOf(d_id),String.valueOf(c_id));
 				stmtGetDistURI.executeSync(String.valueOf(w_id),String.valueOf(d_id));
