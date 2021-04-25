@@ -228,7 +228,7 @@ public class NewOrderThespis extends TPCCProcedure {
 				return;
 			}
 
-			if(false) {
+			if(true) {
 				RESTStmt.executeSync("http://10.132.0.34:30002/");
 				RESTStmt.executeSync("http://10.132.0.35:30002/");
 				RESTStmt.executeSync("http://10.132.0.33:30002/");
@@ -236,7 +236,7 @@ public class NewOrderThespis extends TPCCProcedure {
 				return;
 			}
 
-			if(true) {
+			if(false) {
 				stmtGetWhseURI.executeSync(new String[]{String.valueOf(w_id)});
 				stmtGetCustURI.executeSync(String.valueOf(w_id),String.valueOf(d_id),String.valueOf(c_id));
 				stmtGetDistURI.executeSync(String.valueOf(w_id),String.valueOf(d_id));
