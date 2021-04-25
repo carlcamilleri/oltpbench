@@ -46,13 +46,13 @@ public class NewOrderThespis extends TPCCProcedure {
 
 
 	public final RESTStmt stmtGetCustURI = new RESTStmt(
-    		"http://10.132.0.30:5000/api/query/select/tpc_c/"+TPCCConstants.TABLENAME_CUSTOMER +"?w=c_w_id:[0] AND c_d_id:[1] AND c_id:[2]");
+    		"http://10.132.0.36:5000/api/query/select/tpc_c/"+TPCCConstants.TABLENAME_CUSTOMER +"?w=c_w_id:[0] AND c_d_id:[1] AND c_id:[2]");
 
 	public final RESTStmt stmtGetWhseURI = new RESTStmt(
-			"http://10.132.0.30:5000/api/query/select/tpc_c/"+TPCCConstants.TABLENAME_WAREHOUSE +"?w=w_id:[0]");
+			"http://10.132.0.36:5000/api/query/select/tpc_c/"+TPCCConstants.TABLENAME_WAREHOUSE +"?w=w_id:[0]");
 
 	public final RESTStmt stmtGetDistURI = new RESTStmt(
-			"http://10.132.0.30:5000/api/query/select/tpc_c/"+TPCCConstants.TABLENAME_DISTRICT +"?w=d_w_id:[0] AND d_id:[1]");
+			"http://10.132.0.36:5000/api/query/select/tpc_c/"+TPCCConstants.TABLENAME_DISTRICT +"?w=d_w_id:[0] AND d_id:[1]");
 //
 //    public final SQLStmt stmtGetDistSQL = new SQLStmt(
 //    		"SELECT D_NEXT_O_ID, D_TAX " +
@@ -229,9 +229,9 @@ public class NewOrderThespis extends TPCCProcedure {
 			}
 
 			if(true) {
-				RESTStmt.executeSync("http://10.132.0.34:30002/");
-				RESTStmt.executeSync("http://10.132.0.35:30002/");
-				RESTStmt.executeSync("http://10.132.0.33:30002/");
+//				RESTStmt.executeSync("http://10.132.0.34:30002/");
+//				RESTStmt.executeSync("http://10.132.0.35:30002/");
+//				RESTStmt.executeSync("http://10.132.0.33:30002/");
 
 				return;
 			}
