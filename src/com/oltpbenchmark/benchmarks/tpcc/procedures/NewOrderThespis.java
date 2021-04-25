@@ -217,13 +217,18 @@ public class NewOrderThespis extends TPCCProcedure {
 							return RESTStmt.executeSync("http://10.132.0.26:5000/");
 						}, pool);
 
-				var r = Stream.of(fut1,fut2)
+				var fut3 =
+						CompletableFuture.supplyAsync(() -> {
+							return RESTStmt.executeSync("http://10.132.0.26:5000/");
+						}, pool);
+
+				var r = Stream.of(fut1,fut2,fut3)
 						.map(CompletableFuture::join).collect(Collectors.toList());
 
 				return;
 			}
 
-			if(true) {
+			if(false) {
 				stmtGetWhseURI.executeSync(new String[]{String.valueOf(w_id)});
 				stmtGetCustURI.executeSync(String.valueOf(w_id),String.valueOf(d_id),String.valueOf(c_id));
 				stmtGetDistURI.executeSync(String.valueOf(w_id),String.valueOf(d_id));
