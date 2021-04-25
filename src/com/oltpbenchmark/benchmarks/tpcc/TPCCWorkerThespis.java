@@ -49,6 +49,7 @@ public class TPCCWorkerThespis extends TPCCWorker {
                              int terminalDistrictUpperID, int numWarehouses)
 			throws SQLException {
 		super(benchmarkModule, id,terminalWarehouseID,terminalDistrictLowerID,terminalDistrictUpperID,numWarehouses);
+		this.conn.close();
 	}
 
 	/**
