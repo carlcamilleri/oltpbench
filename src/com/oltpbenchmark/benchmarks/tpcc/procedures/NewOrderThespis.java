@@ -228,10 +228,10 @@ public class NewOrderThespis extends TPCCProcedure {
 				return;
 			}
 
-			if(true) {
-//				RESTStmt.executeSync("http://10.132.0.34:30002/");
-//				RESTStmt.executeSync("http://10.132.0.35:30002/");
-//				RESTStmt.executeSync("http://10.132.0.33:30002/");
+			if(false) {
+				RESTStmt.executeSync("http://10.132.0.34:30002/");
+				RESTStmt.executeSync("http://10.132.0.35:30002/");
+				RESTStmt.executeSync("http://10.132.0.33:30002/");
 
 				return;
 			}
