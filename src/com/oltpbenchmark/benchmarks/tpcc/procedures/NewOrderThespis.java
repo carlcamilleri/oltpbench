@@ -37,6 +37,7 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
 public class NewOrderThespis extends TPCCProcedure {
@@ -322,33 +323,37 @@ public class NewOrderThespis extends TPCCProcedure {
 //			).collect(Collectors.toList());
 //
 
-//
-//			var jarrGetCust = new JSONObject(resGetCust).getJSONArray("entities");
-//
-//			if(jarrGetCust.length()!=1)
-//				throw new RuntimeException("Invalid response: "+resGetCust);
-//
-//			var custObj = jarrGetCust.getJSONObject(0).getJSONObject("data");
-//			c_discount = Float.parseFloat(custObj.get("c_discount").toString());
-//			c_last = custObj.get("c_last").toString();
-//			c_credit = custObj.get("c_credit").toString();
-//
-//
-//			var jarrGetWhse = new JSONObject(resGetWhse).getJSONArray("entities");
-//			if(jarrGetWhse.length()!=1)
-//				throw new RuntimeException("Invalid response: "+resGetWhse);
-//
-//			var whseObj = jarrGetWhse.getJSONObject(0).getJSONObject("data");
-//			w_tax = Float.parseFloat(whseObj.get("w_tax").toString());
-//
-//			var jarrGetDist = new JSONObject(resGetDist).getJSONArray("entities");
-//			if(jarrGetDist.length()!=1)
-//				throw new RuntimeException("Invalid response: "+resGetDist);
-//
-//			var distObj = jarrGetDist.getJSONObject(0).getJSONObject("data");
-//			d_next_o_id = Integer.parseInt(distObj.get("d_next_o_id").toString());
-//			d_tax = Float.parseFloat(distObj.get("d_tax").toString());
-//
+
+			var jarrGetCust = new JSONObject(resGetCust).getJSONArray("entities");
+
+			if(jarrGetCust.length()!=1)
+				throw new RuntimeException("Invalid response: "+resGetCust);
+
+
+
+			var custObj = jarrGetCust.getJSONObject(0).getJSONObject("data");
+
+
+			c_discount = (float) custObj.getDouble("c_discount");
+			c_last = custObj.getString("c_last");
+			c_credit = custObj.getString("c_credit");
+
+
+			var jarrGetWhse = new JSONObject(resGetWhse).getJSONArray("entities");
+			if(jarrGetWhse.length()!=1)
+				throw new RuntimeException("Invalid response: "+resGetWhse);
+
+			var whseObj = jarrGetWhse.getJSONObject(0).getJSONObject("data");
+			w_tax = (float) whseObj.getDouble("w_tax");
+
+			var jarrGetDist = new JSONObject(resGetDist).getJSONArray("entities");
+			if(jarrGetDist.length()!=1)
+				throw new RuntimeException("Invalid response: "+resGetDist);
+
+			var distObj = jarrGetDist.getJSONObject(0).getJSONObject("data");
+			d_next_o_id = distObj.getInt("d_next_o_id");
+			d_tax = (float) distObj.getDouble("d_tax") ;
+
 
 //						d_next_o_id = rs.getInt("D_NEXT_O_ID");
 //			d_tax = rs.getFloat("D_TAX");
@@ -563,7 +568,7 @@ public class NewOrderThespis extends TPCCProcedure {
 //
 //			total_amount *= (1 + w_tax + d_tax) * (1 - c_discount);
 		}// catch(Procedure.UserAbortException | JSONException userEx)
-		catch(UserAbortException   userEx)
+		catch(UserAbortException | JSONException userEx)
 		{
 		    LOG.error("Caught an expected error in New Order");
 		    throw new RuntimeException(userEx);
