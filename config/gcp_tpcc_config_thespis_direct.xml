@@ -5,7 +5,7 @@
     <dbtype>postgres</dbtype>
     <driver>org.postgresql.Driver</driver>
     <!--<DBUrl>jdbc:postgresql://35.195.218.115:5432/tpc_c</DBUrl>-->
-	<DBUrl>jdbc:postgresql://10.132.0.41:6432/tpc_c</DBUrl>
+	<DBUrl>jdbc:postgresql://10.132.0.41:6432/tpc_c?prepareThreshold=0</DBUrl>
     <username>postgres</username>
     <password>HRy4TK*V</password>
     <isolation>TRANSACTION_READ_COMMITTED</isolation>
