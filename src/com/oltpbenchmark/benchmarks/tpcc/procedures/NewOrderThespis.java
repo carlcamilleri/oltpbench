@@ -47,13 +47,16 @@ public class NewOrderThespis extends TPCCProcedure {
 
 
 	public final RESTStmt stmtGetCustURI = new RESTStmt(
-    		"http://10.132.0.40:5000/api/query/select/tpc_c/"+TPCCConstants.TABLENAME_CUSTOMER +"?w=c_w_id:[0] AND c_d_id:[1] AND c_id:[2]");
+    		"http://10.132.0.45:5000/api/query/select/tpc_c/"+TPCCConstants.TABLENAME_CUSTOMER +"?w=c_w_id:[0] AND c_d_id:[1] AND c_id:[2]");
 
 	public final RESTStmt stmtGetWhseURI = new RESTStmt(
-			"http://10.132.0.40:5000/api/query/select/tpc_c/"+TPCCConstants.TABLENAME_WAREHOUSE +"?w=w_id:[0]");
+			"http://10.132.0.45:5000/api/query/select/tpc_c/"+TPCCConstants.TABLENAME_WAREHOUSE +"?w=w_id:[0]");
 
 	public final RESTStmt stmtGetDistURI = new RESTStmt(
-			"http://10.132.0.40:5000/api/query/select/tpc_c/"+TPCCConstants.TABLENAME_DISTRICT +"?w=d_w_id:[0] AND d_id:[1]");
+			"http://10.132.0.45:5000/api/query/select/tpc_c/"+TPCCConstants.TABLENAME_DISTRICT +"?w=d_w_id:[0] AND d_id:[1]");
+
+	public final RESTStmt stmtGetItemURI = new RESTStmt(
+			"http://10.132.0.45:5000/api/query/select/tpc_c/"+TPCCConstants.TABLENAME_ITEM +"?w=i_id:[0]");
 //
 //    public final SQLStmt stmtGetDistSQL = new SQLStmt(
 //    		"SELECT D_NEXT_O_ID, D_TAX " +
@@ -355,48 +358,11 @@ public class NewOrderThespis extends TPCCProcedure {
 			d_tax = (float) distObj.getDouble("d_tax") ;
 
 
-//						d_next_o_id = rs.getInt("D_NEXT_O_ID");
-//			d_tax = rs.getFloat("D_TAX");
-
-
-			//Stream.of(results).forEach(r->LOG.info(r));
-
-
-//
-//			if (!rs.next())
-//				throw new RuntimeException("C_D_ID=" + d_id
-//						+ " C_ID=" + c_id + " not found!");
-//			c_discount = rs.getFloat("C_DISCOUNT");
-//			c_last = rs.getString("C_LAST");
-//			c_credit = rs.getString("C_CREDIT");
-//			rs.close();
-//			rs = null;
-//
-//			stmtGetWhse.setInt(1, w_id);
-//			rs = stmtGetWhse.executeQuery();
-//			if (!rs.next())
-//				throw new RuntimeException("W_ID=" + w_id + " not found!");
-//			w_tax = rs.getFloat("W_TAX");
-//			rs.close();
-//			rs = null;
-//
-//			stmtGetDist.setInt(1, w_id);
-//			stmtGetDist.setInt(2, d_id);
-//			rs = stmtGetDist.executeQuery();
-//			if (!rs.next()) {
-//				throw new RuntimeException("D_ID=" + d_id + " D_W_ID=" + w_id
-//						+ " not found!");
-//			}
-//			d_next_o_id = rs.getInt("D_NEXT_O_ID");
-//			d_tax = rs.getFloat("D_TAX");
-//			rs.close();
-//			rs = null;
-//
-//			//woonhak, need to change order because of foreign key constraints
-//			//update next_order_id first, but it might doesn't matter
-//			stmtUpdateDist.setInt(1, w_id);
-//			stmtUpdateDist.setInt(2, d_id);
-//			int result = stmtUpdateDist.executeUpdate();
+			//woonhak, need to change order because of foreign key constraints
+			//update next_order_id first, but it might doesn't matter
+			stmtUpdateDist.setInt(1, w_id);
+			stmtUpdateDist.setInt(2, d_id);
+			int result = stmtUpdateDist.executeUpdate();
 //			if (result == 0)
 //				throw new RuntimeException(
 //						"Error!! Cannot update next_order_id on district for D_ID="
