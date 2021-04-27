@@ -360,9 +360,9 @@ public class NewOrderThespis extends TPCCProcedure {
 
 			//woonhak, need to change order because of foreign key constraints
 			//update next_order_id first, but it might doesn't matter
-			stmtUpdateDist.setInt(1, w_id);
-			stmtUpdateDist.setInt(2, d_id);
-			int result = stmtUpdateDist.executeUpdate();
+			//stmtUpdateDist.setInt(1, w_id);
+			//stmtUpdateDist.setInt(2, d_id);
+			//int result = stmtUpdateDist.executeUpdate();
 //			if (result == 0)
 //				throw new RuntimeException(
 //						"Error!! Cannot update next_order_id on district for D_ID="
