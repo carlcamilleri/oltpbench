@@ -1,0 +1,46 @@
+<?xml version="1.0"?>
+<parameters>
+
+    <!-- Connection details -->
+    <dbtype>postgres</dbtype>
+    <driver>org.postgresql.Driver</driver>
+    <!--<DBUrl>jdbc:postgresql://35.195.218.115:5432/tpc_c</DBUrl>-->
+	<DBUrl>jdbc:postgresql://10.132.0.41:6432/ycsb?prepareThreshold=0</DBUrl>
+    <username>postgres</username>
+    <password>HRy4TK*V</password>
+    <isolation>TRANSACTION_READ_COMMITTED</isolation>
+    <uploadCode></uploadCode>
+
+    <!-- Scale factor is the number of warehouses in TPCC -->
+    <scalefactor>1</scalefactor>
+
+    <!-- The workload -->
+    <terminals>100</terminals>
+    <works>
+        <work>
+            <time>60</time>
+            <rate>unlimited</rate>
+            <!--<weights>45,43,4,4,4</weights>-->
+            <weights>100</weights>
+        </work>
+    </works>
+
+    <!-- TPCC specific -->
+    <transactiontypes>
+        <transactiontype>
+            <name>NewOrder</name>
+        </transactiontype>
+        <!--<transactiontype>
+            <name>Payment</name>
+        </transactiontype>
+        <transactiontype>
+            <name>OrderStatus</name>
+        </transactiontype>
+        <transactiontype>
+            <name>Delivery</name>
+        </transactiontype>
+        <transactiontype>
+            <name>StockLevel</name>
+        </transactiontype>-->
+    </transactiontypes>
+</parameters>
