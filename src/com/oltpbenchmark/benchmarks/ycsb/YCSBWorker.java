@@ -125,7 +125,7 @@ public class YCSBWorker extends Worker<YCSBBenchmark> {
         int keyname = readRecord.nextInt();
         this.procReadRecord.run(conn, keyname, this.results);
 
-        LOG.info(String.join(",",Arrays.asList(this.results)));
+        //LOG.info(String.join(",",Arrays.asList(this.results)));
     }
 
     private void readModifyWriteRecord() throws SQLException {
