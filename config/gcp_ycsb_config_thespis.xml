@@ -24,12 +24,29 @@
             <time>60</time>
             <rate>unlimited</rate>
             <!-- <weights>90,10</weights> -->
-            <weights>100</weights>
+            <weights>read</weights>
+        </work>
+        <work>
+            <time>60</time>
+            <rate>unlimited</rate>
+            <!-- <weights>90,10</weights> -->
+            <weights>write</weights>
         </work>
     </works>
 
     <!-- YCSB Procedures declaration -->
     <transactiontypes>
+         <groupings>
+            <grouping>
+                <name>read</name>
+                <weights>100</weights>
+            </grouping>
+            <grouping>
+                <name>write</name>
+                <weights>100</weights>
+            </grouping>
+        </groupings>
+
         <transactiontype>
             <name>ReadRecordThespis</name>
         </transactiontype>
