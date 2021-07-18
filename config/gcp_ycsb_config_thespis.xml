@@ -31,7 +31,7 @@
     <!-- YCSB Procedures declaration -->
     <transactiontypes>
         <transactiontype>
-            <name>ReadRecord</name>
+            <name>ReadRecordThespis</name>
         </transactiontype>
         <!-- <transactiontype>
             <name>InsertRecord</name>
