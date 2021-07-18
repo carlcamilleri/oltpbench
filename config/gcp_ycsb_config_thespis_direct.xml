@@ -10,8 +10,8 @@
     <password>HRy4TK*V</password>
     <isolation>TRANSACTION_READ_COMMITTED</isolation>
 
-    <uploadCode></uploadCode>
-    <uploadUrl></uploadUrl>
+    <!--<uploadCode></uploadCode>
+    <uploadUrl></uploadUrl>-->
     <!-- Scalefactor in YCSB is *1000 the number of rows in the USERTABLE-->
     <scalefactor>1200</scalefactor>
 
