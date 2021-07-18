@@ -42,7 +42,7 @@ import com.oltpbenchmark.util.Histogram;
 import com.oltpbenchmark.util.StringUtil;
 
 public abstract class Worker<T extends BenchmarkModule> implements Runnable {
-    private static final Logger LOG = Logger.getLogger(Worker.class);
+    protected static final Logger LOG = Logger.getLogger(Worker.class);
     private WorkloadState wrkldState;
     private LatencyRecord latencies;
     private Statement currStatement;

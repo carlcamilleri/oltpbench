@@ -18,7 +18,9 @@ package com.oltpbenchmark.benchmarks.ycsb;
 
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Random;
+import java.util.stream.Collectors;
 
 import com.oltpbenchmark.api.Procedure;
 import com.oltpbenchmark.api.Procedure.UserAbortException;
@@ -34,6 +36,7 @@ import com.oltpbenchmark.distributions.CounterGenerator;
 import com.oltpbenchmark.distributions.ZipfianGenerator;
 import com.oltpbenchmark.types.TransactionStatus;
 import com.oltpbenchmark.util.TextGenerator;
+import org.apache.openjpa.lib.log.Log;
 
 /**
  * YCSBWorker Implementation
@@ -121,6 +124,8 @@ public class YCSBWorker extends Worker<YCSBBenchmark> {
         assert (this.procReadRecord != null);
         int keyname = readRecord.nextInt();
         this.procReadRecord.run(conn, keyname, this.results);
+
+        LOG.info(String.join(",",Arrays.asList(this.results)));
     }
 
     private void readModifyWriteRecord() throws SQLException {
