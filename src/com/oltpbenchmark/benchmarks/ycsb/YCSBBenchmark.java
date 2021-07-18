@@ -24,6 +24,7 @@ import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.oltpbenchmark.DBWorkload;
 import com.oltpbenchmark.WorkloadConfiguration;
 import com.oltpbenchmark.api.BenchmarkModule;
 import com.oltpbenchmark.api.Loader;
@@ -31,9 +32,10 @@ import com.oltpbenchmark.api.Worker;
 import com.oltpbenchmark.benchmarks.ycsb.procedures.InsertRecord;
 import com.oltpbenchmark.catalog.Table;
 import com.oltpbenchmark.util.SQLUtil;
+import org.apache.log4j.Logger;
 
 public class YCSBBenchmark extends BenchmarkModule {
-
+    private static final Logger LOG = Logger.getLogger(YCSBBenchmark.class);
     public YCSBBenchmark(WorkloadConfiguration workConf) {
         super("ycsb", workConf, true);
     }
@@ -60,6 +62,8 @@ public class YCSBBenchmark extends BenchmarkModule {
             res.close();
             //
             for (int i = 0; i < workConf.getTerminals(); ++i) {
+                LOG.info(String.format("Launching termnal %s ", i));
+
                 workers.add(YCSBWorkerFactory.createWorker(this, i, init_record_count + 1));
             } // FOR
             metaConn.close();
