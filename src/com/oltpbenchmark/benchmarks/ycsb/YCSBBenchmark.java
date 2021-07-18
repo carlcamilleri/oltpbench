@@ -23,6 +23,9 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.CompletableFuture;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import com.oltpbenchmark.DBWorkload;
 import com.oltpbenchmark.WorkloadConfiguration;
@@ -60,12 +63,32 @@ public class YCSBBenchmark extends BenchmarkModule {
             }
             assert init_record_count > 0;
             res.close();
-            //
+
+
+
+            var futGetTerminals = new ArrayList<CompletableFuture<Worker<YCSBBenchmark>>>(workConf.getTerminals());
             for (int i = 0; i < workConf.getTerminals(); ++i) {
                 //LOG.info(String.format("Launching termnal %s ", i));
+                var curI = i;
+                var initRecordCount = init_record_count+1;
+                futGetTerminals.add(
+                        CompletableFuture.supplyAsync(() -> {
+                            try {
+                                return YCSBWorkerFactory.createWorker(this, curI, initRecordCount);
+                            } catch (SQLException throwables) {
+                                throwables.printStackTrace();
+                            }
+                            return null;
+                        }));
 
-                workers.add(YCSBWorkerFactory.createWorker(this, i, init_record_count + 1));
+
             } // FOR
+            var resFutures = Stream.of(futGetTerminals.toArray())
+                    .map(f->((CompletableFuture<Worker<YCSBBenchmark>>)f))
+                    .map(CompletableFuture::join).collect(Collectors.toList());
+
+            workers.addAll(resFutures);
+
             metaConn.close();
         } catch (SQLException e) {
             // TODO Auto-generated catch block
