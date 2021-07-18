@@ -56,16 +56,18 @@ public class YCSBWorkerThespis extends Worker<YCSBBenchmark> {
     private final String thespisUrl;
 
     public YCSBWorkerThespis(YCSBBenchmark benchmarkModule, int id, int init_record_count, String thespisUrl) {
-        super(benchmarkModule, id);
+        super(benchmarkModule, id,false);
         readRecord = new ZipfianGenerator(init_record_count);// pool for read keys
         randScan = new ZipfianGenerator(YCSBConstants.MAX_SCAN);
-        
-        synchronized (YCSBWorkerThespis.class) {
-            // We must know where to start inserting
-            if (insertRecord == null) {
-                insertRecord = new CounterGenerator(init_record_count);
-            }
-        } // SYNCH
+
+        if (insertRecord == null) {
+            synchronized (YCSBWorkerThespis.class) {
+                // We must know where to start inserting
+                if (insertRecord == null) {
+                    insertRecord = new CounterGenerator(init_record_count);
+                }
+            } // SYNCH
+        }
         
         // This is a minor speed-up to avoid having to invoke the hashmap look-up
         // everytime we want to execute a txn. This is important to do on 

@@ -91,6 +91,8 @@ public abstract class BenchmarkModule {
      */
     private final Random rng = new Random();
 
+    private Map<TransactionType, Procedure> proc_xref =null;
+
     public BenchmarkModule(String benchmarkName, WorkloadConfiguration workConf, boolean withCatalog) {
         assert (workConf != null) : "The WorkloadConfiguration instance is null.";
 
@@ -425,30 +427,37 @@ public abstract class BenchmarkModule {
      * @return
      */
     public Map<TransactionType, Procedure> getProcedures() {
-        Map<TransactionType, Procedure> proc_xref = new HashMap<TransactionType, Procedure>();
-        TransactionTypes txns = this.workConf.getTransTypes();
+        //Map<TransactionType, Procedure> proc_xref = new HashMap<TransactionType, Procedure>();
+        if(proc_xref==null) {
+            synchronized (BenchmarkModule.class) {
 
-        if (txns != null) {
-            for (Class<? extends Procedure> procClass : this.supplementalProcedures) {
-                TransactionType txn = txns.getType(procClass);
-                if (txn == null) {
-                    txn = new TransactionType(procClass, procClass.hashCode(), true);
-                    txns.add(txn);
+
+                TransactionTypes txns = this.workConf.getTransTypes();
+
+                if (txns != null) {
+                    for (Class<? extends Procedure> procClass : this.supplementalProcedures) {
+                        TransactionType txn = txns.getType(procClass);
+                        if (txn == null) {
+                            txn = new TransactionType(procClass, procClass.hashCode(), true);
+                            txns.add(txn);
+                        }
+                    } // FOR
+
+                    for (TransactionType txn : txns) {
+                        Procedure proc = (Procedure) ClassUtil.newInstance(txn.getProcedureClass(),
+                                new Object[0],
+                                new Class<?>[0]);
+                        proc.initialize(this.workConf.getDBType());
+                        proc_xref.put(txn, proc);
+                        proc.loadSQLDialect(this.dialects);
+                    } // FOR
                 }
-            } // FOR
+                if (proc_xref.isEmpty()) {
+                    LOG.warn("No procedures defined for " + this);
+                }
+            }
+        }
 
-            for (TransactionType txn : txns) {
-                Procedure proc = (Procedure)ClassUtil.newInstance(txn.getProcedureClass(),
-                        new Object[0],
-                        new Class<?>[0]);
-                proc.initialize(this.workConf.getDBType());
-                proc_xref.put(txn, proc);
-                proc.loadSQLDialect(this.dialects);
-            } // FOR
-        }
-        if (proc_xref.isEmpty()) {
-            LOG.warn("No procedures defined for " + this);
-        }
         return (proc_xref);
     }
 
