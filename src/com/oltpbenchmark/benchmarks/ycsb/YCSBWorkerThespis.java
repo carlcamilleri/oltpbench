@@ -52,8 +52,10 @@ public class YCSBWorkerThespis extends Worker<YCSBBenchmark> {
     private final ReadModifyWriteRecord procReadModifyWriteRecord;
     private final InsertRecordThespis procInsertRecord;
     private final DeleteRecord procDeleteRecord;
-    
-    public YCSBWorkerThespis(YCSBBenchmark benchmarkModule, int id, int init_record_count) {
+
+    private final String thespisUrl;
+
+    public YCSBWorkerThespis(YCSBBenchmark benchmarkModule, int id, int init_record_count, String thespisUrl) {
         super(benchmarkModule, id);
         readRecord = new ZipfianGenerator(init_record_count);// pool for read keys
         randScan = new ZipfianGenerator(YCSBConstants.MAX_SCAN);
@@ -74,6 +76,7 @@ public class YCSBWorkerThespis extends Worker<YCSBBenchmark> {
         this.procReadModifyWriteRecord = this.getProcedure(ReadModifyWriteRecord.class);
         this.procInsertRecord = this.getProcedure(InsertRecordThespis.class);
         this.procDeleteRecord = this.getProcedure(DeleteRecord.class);
+        this.thespisUrl = thespisUrl;
     }
 
     @Override
@@ -114,7 +117,7 @@ public class YCSBWorkerThespis extends Worker<YCSBBenchmark> {
     private void readRecord() throws SQLException {
         assert (this.procReadRecord != null);
         int keyname = readRecord.nextInt();
-        this.procReadRecord.run(conn, keyname, this.results);
+        this.procReadRecord.run(this.thespisUrl, keyname, this.results);
     }
 
     private void readModifyWriteRecord() throws SQLException {
@@ -128,7 +131,7 @@ public class YCSBWorkerThespis extends Worker<YCSBBenchmark> {
         assert (this.procInsertRecord != null);
         int keyname = insertRecord.nextInt();
         this.buildParameters();
-        this.procInsertRecord.run(conn, keyname, this.params);
+        this.procInsertRecord.run(this.thespisUrl, keyname, this.params);
     }
 
     private void deleteRecord() throws SQLException {

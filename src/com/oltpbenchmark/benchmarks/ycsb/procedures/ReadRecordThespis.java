@@ -42,15 +42,15 @@ public class ReadRecordThespis extends Procedure{
     private static final ExecutorService pool = Executors.newFixedThreadPool(256);
     private static final Logger LOG = Logger.getLogger(ReadRecordThespis.class);
 
-    public final RESTStmt readStmtUri = new RESTStmt(
-            "http://10.132.0.45:5000/api/query/select/ycsb/USERTABLE?w=ycsb_key:[0]");
+
 
 	//FIXME: The value in ysqb is a byteiterator
-    public void run(Connection conn, int keyname, String results[]) throws SQLException {
+    public void run(String thespisUrl, int keyname, String results[]) throws SQLException {
         try {
+        var readStmtUri = new RESTStmt(thespisUrl+"api/query/select/ycsb/USERTABLE?w=ycsb_key:[0]");
         var futGetUserTable =
                 CompletableFuture.supplyAsync(() -> {
-                    return readStmtUri.executeSync(String.valueOf(keyname));
+                    return readStmtUri.executeSync(new String[]{String.valueOf(keyname)});
                 }, pool);
 
         var resFutures = Stream.of(futGetUserTable)
@@ -71,7 +71,7 @@ public class ReadRecordThespis extends Procedure{
 
 
         for (int i = 1; i <= YCSBConstants.NUM_FIELDS; i++)
-            results[i] = userTableObj.getString("field"+ i);
+            results[i-1] = userTableObj.getString("field"+ i);
 
 
 

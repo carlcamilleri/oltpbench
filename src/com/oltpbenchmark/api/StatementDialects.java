@@ -37,7 +37,7 @@ import javax.xml.validation.Schema;
 import javax.xml.validation.SchemaFactory;
 
 import org.apache.log4j.Logger;
-import org.xml.sax.SAXException;
+
 
 import com.oltpbenchmark.api.dialects.DialectType;
 import com.oltpbenchmark.api.dialects.DialectsType;
@@ -45,6 +45,7 @@ import com.oltpbenchmark.api.dialects.ObjectFactory;
 import com.oltpbenchmark.api.dialects.ProcedureType;
 import com.oltpbenchmark.api.dialects.StatementType;
 import com.oltpbenchmark.types.DatabaseType;
+import org.xml.sax.SAXException;
 
 /**
  * 

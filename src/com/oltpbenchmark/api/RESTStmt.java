@@ -192,12 +192,12 @@ public final class RESTStmt {
     }
 
     public CompletableFuture<String> execute(String... parameters) {
-        return this.execute(this.getFinalURI(parameters));
+        return RESTStmt.execute(this.getFinalURI(parameters));
     }
 
 
     public String executeSync(String... parameters) {
-        return this.executeSync(this.getFinalURI(parameters));
+        return RESTStmt.executeSync(this.getFinalURI(parameters));
     }
 
 
