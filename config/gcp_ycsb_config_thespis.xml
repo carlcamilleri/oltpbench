@@ -13,7 +13,7 @@
 
 
     <uploadCode></uploadCode>
-    <uploadUrl></uploadUrl>
+    <!--<uploadUrl></uploadUrl>-->
     <!-- Scalefactor in YCSB is *1000 the number of rows in the USERTABLE-->
     <scalefactor>1200</scalefactor>
 
