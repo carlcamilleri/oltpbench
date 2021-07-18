@@ -62,7 +62,7 @@ public class YCSBBenchmark extends BenchmarkModule {
             res.close();
             //
             for (int i = 0; i < workConf.getTerminals(); ++i) {
-                //LOG.info(String.format("Launching termnal %s ", i));
+                LOG.info(String.format("Launching termnal %s ", i));
 
                 workers.add(YCSBWorkerFactory.createWorker(this, i, init_record_count + 1));
             } // FOR
