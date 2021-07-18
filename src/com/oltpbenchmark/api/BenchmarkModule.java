@@ -431,7 +431,8 @@ public abstract class BenchmarkModule {
         if(proc_xref==null) {
             synchronized (BenchmarkModule.class) {
                 if(proc_xref==null) {
-                    proc_xref = new HashMap<>();
+
+                   var procXref = new  HashMap<TransactionType, Procedure>();
                     TransactionTypes txns = this.workConf.getTransTypes();
 
                     if (txns != null) {
@@ -448,13 +449,14 @@ public abstract class BenchmarkModule {
                                     new Object[0],
                                     new Class<?>[0]);
                             proc.initialize(this.workConf.getDBType());
-                            proc_xref.put(txn, proc);
+                            procXref.put(txn, proc);
                             proc.loadSQLDialect(this.dialects);
                         } // FOR
                     }
-                    if (proc_xref.isEmpty()) {
+                    if (procXref.isEmpty()) {
                         LOG.warn("No procedures defined for " + this);
                     }
+                    proc_xref = procXref;
                 }
             }
         }
