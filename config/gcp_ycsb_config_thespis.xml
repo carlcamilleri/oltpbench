@@ -1,0 +1,52 @@
+<?xml version="1.0"?>
+<parameters>
+
+    <!-- Connection details -->
+    <dbtype>postgres</dbtype>
+    <driver>org.postgresql.Driver</driver>
+    <!--<DBUrl>jdbc:postgresql://35.195.218.115:5432/tpc_c</DBUrl>-->
+    <DBUrl>jdbc:postgresql://10.132.0.41:6432/ycsb?prepareThreshold=0</DBUrl>
+    <username>postgres</username>
+    <password>HRy4TK*V</password>
+    <isolation>TRANSACTION_READ_COMMITTED</isolation>
+    <thespisUrl>http://localhost:60000/</thespisUrl>
+
+
+    <uploadCode></uploadCode>
+    <uploadUrl></uploadUrl>
+    <!-- Scalefactor in YCSB is *1000 the number of rows in the USERTABLE-->
+    <scalefactor>1200</scalefactor>
+
+    <!-- The workload -->
+    <terminals>50</terminals>
+    <works>
+        <work>
+            <time>60</time>
+            <rate>unlimited</rate>
+            <!-- <weights>90,10</weights> -->
+            <weights>100</weights>
+        </work>
+    </works>
+
+    <!-- YCSB Procedures declaration -->
+    <transactiontypes>
+        <transactiontype>
+            <name>ReadRecord</name>
+        </transactiontype>
+        <!-- <transactiontype>
+            <name>InsertRecord</name>
+        </transactiontype>-->
+<!--        <transactiontype>-->
+<!--            <name>ScanRecord</name>-->
+<!--        </transactiontype>-->
+<!--        <transactiontype>-->
+<!--            <name>UpdateRecord</name>-->
+<!--        </transactiontype>-->
+<!--        <transactiontype>-->
+<!--            <name>DeleteRecord</name>-->
+<!--        </transactiontype>-->
+<!--        <transactiontype>-->
+<!--            <name>ReadModifyWriteRecord</name>-->
+<!--        </transactiontype>-->
+    </transactiontypes>
+</parameters>
