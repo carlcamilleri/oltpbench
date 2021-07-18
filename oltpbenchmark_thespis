@@ -1,0 +1,1 @@
+./oltpbenchmark -b ycsb_thespis -c config/gcp_ycsb_config_thespis.xml --execute=true
