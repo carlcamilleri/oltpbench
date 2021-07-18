@@ -40,24 +40,25 @@ public class InsertRecordThespis extends Procedure{
     private static final ExecutorService pool = Executors.newFixedThreadPool(256);
     private static final Logger LOG = Logger.getLogger(ReadRecordThespis.class);
 
-    private RESTStmt insertStmtUri = null;
 
     public InsertRecordThespis(){
 
 
-        var url = "http://10.132.0.45:5000/api/query/insert/ycsb/usertable?i=SET(ycsb_key,[0])&"+
-                IntStream.rangeClosed(1,YCSBConstants.NUM_FIELDS)
-                        .mapToObj(i-> "i=SET(field"+i+",["+i+"])")
-                        .collect(Collectors.joining("&"));
-
-        insertStmtUri = new RESTStmt(url);
     }
 
-    public void run(Connection conn, int keyname, String vals[]) throws SQLException {
+    public void run(String thespisUrl, int keyname, String vals[]) throws SQLException {
         try {
+            var url = thespisUrl+"api/query/insert/ycsb/usertable?i=SET(ycsb_key,[0])&"+
+                    IntStream.rangeClosed(1,YCSBConstants.NUM_FIELDS)
+                            .mapToObj(i-> "i=SET(field"+i+",["+i+"])")
+                            .collect(Collectors.joining("&"));
+
+            var insertStmtUri = new RESTStmt(url);
+
+
             var futInsertUserTable =
                     CompletableFuture.supplyAsync(() -> {
-                        return insertStmtUri.executeSync(String.valueOf(keyname));
+                        return insertStmtUri.executeSync(new String[]{ String.valueOf(keyname)});
                     }, pool);
 
             var resFutures = Stream.of(futInsertUserTable)
