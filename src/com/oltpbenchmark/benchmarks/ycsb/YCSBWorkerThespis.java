@@ -28,6 +28,7 @@ import com.oltpbenchmark.util.TextGenerator;
 
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Random;
 
 /**
@@ -121,6 +122,8 @@ public class YCSBWorkerThespis extends Worker<YCSBBenchmark> {
         assert (this.procReadRecord != null);
         int keyname = readRecord.nextInt();
         this.procReadRecord.run(this.thespisUrl, keyname, this.results);
+
+        LOG.info(String.join(",", Arrays.asList(this.results)));
     }
 
     private void readModifyWriteRecord() throws SQLException {
