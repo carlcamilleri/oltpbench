@@ -63,7 +63,7 @@ public final class RESTStmt {
             .connectTimeout(10, TimeUnit.SECONDS)
             .readTimeout(10, TimeUnit.SECONDS)
             //.dispatcher(new Dispatcher(Executors.newFixedThreadPool(256)))
-            .retryOnConnectionFailure(false)
+            .retryOnConnectionFailure(true)
             .socketFactory(new SocketFactoryTcpNoDelay())
             .connectionPool(new ConnectionPool(256,60,TimeUnit.SECONDS))
 
