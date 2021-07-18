@@ -43,7 +43,6 @@ import com.oltpbenchmark.util.StringUtil;
 
 public abstract class Worker<T extends BenchmarkModule> implements Runnable {
     private static final Logger LOG = Logger.getLogger(Worker.class);
-
     private WorkloadState wrkldState;
     private LatencyRecord latencies;
     private Statement currStatement;
@@ -67,8 +66,11 @@ public abstract class Worker<T extends BenchmarkModule> implements Runnable {
     private final Map<TransactionType, Histogram<String>> txnAbortMessages = new HashMap<TransactionType, Histogram<String>>();
 
     private boolean seenDone = false;
-
     public Worker(T benchmarkModule, int id) {
+        this(benchmarkModule,id,true);
+
+    }
+    public Worker(T benchmarkModule, int id, boolean connectToDatabase) {
         this.id = id;
         this.benchmarkModule = benchmarkModule;
         this.wrkld = this.benchmarkModule.getWorkloadConfiguration();
@@ -77,18 +79,23 @@ public abstract class Worker<T extends BenchmarkModule> implements Runnable {
         this.transactionTypes = this.wrkld.getTransTypes();
         assert (this.transactionTypes != null) : "The TransactionTypes from the WorkloadConfiguration is null!";
 
-        try {
-            this.conn = this.benchmarkModule.makeConnection();
-            this.conn.setAutoCommit(false);
-            
-            // 2018-01-11: Since we want to support NoSQL systems 
-            // that do not support txns, we will not invoke certain JDBC functions
-            // that may cause an error in them.
-            if (this.wrkld.getDBType().shouldUseTransactions()) {
-                this.conn.setTransactionIsolation(this.wrkld.getIsolationMode());
+        if(connectToDatabase) {
+            try {
+                this.conn = this.benchmarkModule.makeConnection();
+                this.conn.setAutoCommit(false);
+
+                // 2018-01-11: Since we want to support NoSQL systems
+                // that do not support txns, we will not invoke certain JDBC functions
+                // that may cause an error in them.
+                if (this.wrkld.getDBType().shouldUseTransactions()) {
+                    this.conn.setTransactionIsolation(this.wrkld.getIsolationMode());
+                }
+            } catch (SQLException ex) {
+                throw new RuntimeException("Failed to connect to database", ex);
             }
-        } catch (SQLException ex) {
-            throw new RuntimeException("Failed to connect to database", ex);
+        }
+        else {
+            conn=null;
         }
 
         // Generate all the Procedures that we're going to need
