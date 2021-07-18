@@ -48,15 +48,18 @@ public class ReadRecordThespis extends Procedure{
     public void run(String thespisUrl, int keyname, String results[]) throws SQLException {
         try {
         var readStmtUri = new RESTStmt(thespisUrl+"api/query/select/ycsb/USERTABLE?w=ycsb_key:[0]");
-        var futGetUserTable =
-                CompletableFuture.supplyAsync(() -> {
-                    return readStmtUri.executeSync(new String[]{String.valueOf(keyname)});
-                }, pool);
 
-        var resFutures = Stream.of(futGetUserTable)
-                .map(CompletableFuture::join).collect(Collectors.toList());
+//        var futGetUserTable =
+//                CompletableFuture.supplyAsync(() -> {
+//                    return readStmtUri.executeSync(new String[]{String.valueOf(keyname)});
+//                }, pool);
+//
+//        var resFutures = Stream.of(futGetUserTable)
+//                .map(CompletableFuture::join).collect(Collectors.toList());
+//
+//        var resGetUserTable = resFutures.get(0);
 
-        var resGetUserTable = resFutures.get(0);
+            var resGetUserTable = readStmtUri.executeSync(new String[]{String.valueOf(keyname)});;
 
         JSONArray jarrGetCust = null;
 
