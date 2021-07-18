@@ -9,7 +9,7 @@
     <username>postgres</username>
     <password>HRy4TK*V</password>
     <isolation>TRANSACTION_READ_COMMITTED</isolation>
-    <thespisUrl>http://localhost:60000/</thespisUrl>
+    <thespisUrl>http://10.132.0.53:5000/</thespisUrl>
 
 
     <uploadCode></uploadCode>
