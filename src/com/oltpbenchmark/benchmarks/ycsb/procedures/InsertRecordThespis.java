@@ -25,10 +25,13 @@ import com.oltpbenchmark.util.json.JSONException;
 import com.oltpbenchmark.util.json.JSONObject;
 import org.apache.log4j.Logger;
 
+import java.io.UnsupportedEncodingException;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
+import java.util.List;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.CompletionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.stream.Collectors;
@@ -58,7 +61,11 @@ public class InsertRecordThespis extends Procedure{
 
             var futInsertUserTable =
                     CompletableFuture.supplyAsync(() -> {
-                        return insertStmtUri.executeSync(new String[]{ String.valueOf(keyname)});
+                        try {
+                            return insertStmtUri.executeSync(Stream.concat(Stream.of(Integer.toString(keyname)), Stream.of(vals)).toArray(String[]::new));
+                        } catch (UnsupportedEncodingException e) {
+                            throw new CompletionException(e);
+                        }
                     }, pool);
 
             var resFutures = Stream.of(futInsertUserTable)

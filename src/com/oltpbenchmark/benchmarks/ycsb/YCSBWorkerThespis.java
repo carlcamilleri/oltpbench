@@ -47,7 +47,7 @@ public class YCSBWorkerThespis extends Worker<YCSBBenchmark> {
     private final String params[] = new String[YCSBConstants.NUM_FIELDS]; 
     private final String results[] = new String[YCSBConstants.NUM_FIELDS];
     
-    private final UpdateRecord procUpdateRecord;
+    private final UpdateRecordThespis procUpdateRecord;
     private final ScanRecord procScanRecord;
     private final ReadRecordThespis procReadRecord;
     private final ReadModifyWriteRecord procReadModifyWriteRecord;
@@ -73,7 +73,7 @@ public class YCSBWorkerThespis extends Worker<YCSBBenchmark> {
         // This is a minor speed-up to avoid having to invoke the hashmap look-up
         // everytime we want to execute a txn. This is important to do on 
         // a client machine with not a lot of cores
-        this.procUpdateRecord = this.getProcedure(UpdateRecord.class);
+        this.procUpdateRecord = this.getProcedure(UpdateRecordThespis.class);
         this.procScanRecord = this.getProcedure(ScanRecord.class);
         this.procReadRecord = this.getProcedure(ReadRecordThespis.class);
         this.procReadModifyWriteRecord = this.getProcedure(ReadModifyWriteRecord.class);
@@ -94,10 +94,11 @@ public class YCSBWorkerThespis extends Worker<YCSBBenchmark> {
             readModifyWriteRecord();
         } else if (procClass.equals(ReadRecordThespis.class)) {
             readRecord();
-        } else if (procClass.equals(ScanRecord.class)) {
-            scanRecord();
-        } else if (procClass.equals(UpdateRecord.class)) {
+        } else if (procClass.equals(UpdateRecordThespis.class)) {
             updateRecord();
+        }
+        else if (procClass.equals(ScanRecord.class)) {
+            scanRecord();
         }
         if(conn!=null)
             conn.commit();
@@ -108,7 +109,7 @@ public class YCSBWorkerThespis extends Worker<YCSBBenchmark> {
         assert (this.procUpdateRecord!= null);
         int keyname = readRecord.nextInt();
         this.buildParameters();
-        this.procUpdateRecord.run(conn, keyname, this.params);
+        this.procUpdateRecord.run(this.thespisUrl, keyname, this.params);
     }
 
     private void scanRecord() throws SQLException {

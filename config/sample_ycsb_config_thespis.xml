@@ -5,7 +5,7 @@
     <dbtype>postgres</dbtype>
     <driver>org.postgresql.Driver</driver>
     <!--<DBUrl>jdbc:postgresql://35.195.218.115:5432/tpc_c</DBUrl>-->
-    <DBUrl>jdbc:postgresql://34.79.106.32:6432/ycsb?prepareThreshold=0</DBUrl>
+    <DBUrl>jdbc:postgresql://23.251.133.10:6432/ycsb?prepareThreshold=0</DBUrl>
     <username>postgres</username>
     <password>HRy4TK*V</password>
     <isolation>TRANSACTION_READ_COMMITTED</isolation>
@@ -22,8 +22,8 @@
         <work>
             <time>60</time>
             <rate>unlimited</rate>
-            <!--<weights>90,10</weights>-->
-            <weights>100</weights>
+            <weights>0,0,100</weights>
+            <!--<weights>100</weights>-->
         </work>
     </works>
 
@@ -32,15 +32,15 @@
         <transactiontype>
             <name>ReadRecordThespis</name>
         </transactiontype>
-        <!-- <transactiontype>
+         <transactiontype>
             <name>InsertRecordThespis</name>
-        </transactiontype> -->
+        </transactiontype>
 <!--        <transactiontype>-->
 <!--            <name>ScanRecord</name>-->
 <!--        </transactiontype>-->
-<!--        <transactiontype>-->
-<!--            <name>UpdateRecord</name>-->
-<!--        </transactiontype>-->
+        <transactiontype>
+            <name>UpdateRecordThespis</name>
+        </transactiontype>
 <!--        <transactiontype>-->
 <!--            <name>DeleteRecord</name>-->
 <!--        </transactiontype>-->

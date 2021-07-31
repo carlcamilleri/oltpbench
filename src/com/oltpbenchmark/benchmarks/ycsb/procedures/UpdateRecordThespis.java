@@ -19,10 +19,7 @@ package com.oltpbenchmark.benchmarks.ycsb.procedures;
 import com.oltpbenchmark.api.Procedure;
 import com.oltpbenchmark.api.RESTStmt;
 import com.oltpbenchmark.api.SQLStmt;
-import com.oltpbenchmark.benchmarks.tpcc.TPCCConstants;
-import com.oltpbenchmark.benchmarks.tpcc.procedures.NewOrderThespis;
 import com.oltpbenchmark.benchmarks.ycsb.YCSBConstants;
-import com.oltpbenchmark.util.json.JSONArray;
 import com.oltpbenchmark.util.json.JSONException;
 import com.oltpbenchmark.util.json.JSONObject;
 import org.apache.log4j.Logger;
@@ -30,60 +27,58 @@ import org.apache.log4j.Logger;
 import java.io.UnsupportedEncodingException;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
-import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.CompletionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
-public class ReadRecordThespis extends Procedure{
+public class UpdateRecordThespis extends Procedure {
 
     private static final ExecutorService pool = Executors.newFixedThreadPool(256);
-    private static final Logger LOG = Logger.getLogger(ReadRecordThespis.class);
+    private static final Logger LOG = Logger.getLogger(UpdateRecordThespis.class);
 
 
-
-	//FIXME: The value in ysqb is a byteiterator
-    public void run(String thespisUrl, int keyname, String results[]) throws SQLException {
+    public void run(String thespisUrl, int keyname, String vals[]) throws SQLException {
         try {
-        var readStmtUri = new RESTStmt(thespisUrl+"api/query/select/ycsb/USERTABLE?w=ycsb_key:[0]");
-
-//        var futGetUserTable =
-//                CompletableFuture.supplyAsync(() -> {
-//                    return readStmtUri.executeSync(new String[]{String.valueOf(keyname)});
-//                }, pool);
-//
-//        var resFutures = Stream.of(futGetUserTable)
-//                .map(CompletableFuture::join).collect(Collectors.toList());
-//
-//        var resGetUserTable = resFutures.get(0);
-
-            var resGetUserTable = readStmtUri.executeSync(new String[]{String.valueOf(keyname)});;
-
-        JSONArray jarrGetCust = null;
-
-            jarrGetCust = new JSONObject(resGetUserTable).getJSONArray("entities");
+            var url = thespisUrl + "api/query/update/ycsb/usertable?w=ycsb_key:[0]&" +
+                    IntStream.rangeClosed(1, YCSBConstants.NUM_FIELDS)
+                            .mapToObj(i -> "u=SET(field" + i + ",["+i+"])")
+                            .collect(Collectors.joining("&"));
 
 
-        if(jarrGetCust.length()!=1)
-            throw new RuntimeException("Invalid response: "+resGetUserTable);
-
-        var userTableObj = jarrGetCust.getJSONObject(0).getJSONObject("data");
+            var updateStmtUri = new RESTStmt(url);
 
 
+            var futUpdateUserTable =
+                    CompletableFuture.supplyAsync(() -> {
+                        try {
+                            return updateStmtUri.executeSync(Stream.concat(Stream.of(Integer.toString(keyname)), Stream.of(vals)).toArray(String[]::new));
+                        } catch (UnsupportedEncodingException e) {
+                            throw new CompletionException(e);
+                        }
+                    }, pool);
 
-        for (int i = 1; i <= YCSBConstants.NUM_FIELDS; i++)
-            results[i-1] = userTableObj.getString("field"+ i);
+            var resFutures = Stream.of(futUpdateUserTable)
+                    .map(CompletableFuture::join).collect(Collectors.toList());
+
+            var resUpdateUserTable = resFutures.get(0);
+
+            boolean isSuccess = false;
+
+            isSuccess = new JSONObject(resUpdateUserTable).getBoolean("isSuccess");
 
 
-
-        } catch(UserAbortException | JSONException | UnsupportedEncodingException userEx)
-        {
+            if (!isSuccess)
+                throw new RuntimeException("Invalid response: " + resUpdateUserTable);
+        } catch (UserAbortException | JSONException userEx) {
             LOG.error("Caught an expected error in New Order");
             throw new RuntimeException(userEx);
         }
     }
+
 
 }

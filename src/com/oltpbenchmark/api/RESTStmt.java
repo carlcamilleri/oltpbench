@@ -26,11 +26,10 @@ import org.jetbrains.annotations.NotNull;
 import javax.net.SocketFactory;
 import java.io.IOException;
 
-import java.net.InetAddress;
-import java.net.Socket;
-import java.net.URI;
+import java.io.UnsupportedEncodingException;
+import java.net.*;
 
-import java.net.UnknownHostException;
+import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Executors;
@@ -120,12 +119,12 @@ public final class RESTStmt {
         this.orig_uri = uri;
     }
 
-    private final String getFinalURI(String... parameters) {
+    private final String getFinalURI(String... parameters) throws UnsupportedEncodingException {
 
 
         var final_uri=this.orig_uri;
         for(int i=0;i< parameters.length;i++) {
-            final_uri=final_uri.replace("["+i+"]",parameters[i]);
+            final_uri=final_uri.replace("["+i+"]", URLEncoder.encode(parameters[i], StandardCharsets.UTF_8.toString()));
         }
         final_uri=final_uri.replace(" ","%20");
         LOG.debug("Resolved: "+final_uri);
@@ -191,12 +190,12 @@ public final class RESTStmt {
         }
     }
 
-    public CompletableFuture<String> execute(String... parameters) {
+    public CompletableFuture<String> execute(String... parameters) throws UnsupportedEncodingException {
         return RESTStmt.execute(this.getFinalURI(parameters));
     }
 
 
-    public String executeSync(String... parameters) {
+    public String executeSync(String... parameters) throws UnsupportedEncodingException {
         return RESTStmt.executeSync(this.getFinalURI(parameters));
     }
 

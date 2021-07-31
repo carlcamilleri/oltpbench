@@ -26,16 +26,15 @@ import com.oltpbenchmark.util.json.JSONException;
 import com.oltpbenchmark.util.json.JSONObject;
 import org.apache.log4j.Logger;
 
+import javax.annotation.processing.Completion;
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Random;
-import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
+import java.util.concurrent.*;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
@@ -257,17 +256,29 @@ public class NewOrderThespis extends TPCCProcedure {
 
 			var futGetCust =
 					CompletableFuture.supplyAsync(() -> {
-						return stmtGetCustURI.executeSync(String.valueOf(w_id),String.valueOf(d_id),String.valueOf(c_id));
+						try {
+							return stmtGetCustURI.executeSync(String.valueOf(w_id),String.valueOf(d_id),String.valueOf(c_id));
+						} catch (UnsupportedEncodingException e) {
+							throw new CompletionException(e);
+						}
 					}, pool);
 
 			var futGetWhse =
 					CompletableFuture.supplyAsync(() -> {
-						return stmtGetWhseURI.executeSync(new String[]{String.valueOf(w_id)});
+						try {
+							return stmtGetWhseURI.executeSync(new String[]{String.valueOf(w_id)});
+						} catch (UnsupportedEncodingException e) {
+							throw new CompletionException(e);
+						}
 					}, pool);
 
 			var futGetDist =
 					CompletableFuture.supplyAsync(() -> {
-						return stmtGetDistURI.executeSync(String.valueOf(w_id),String.valueOf(d_id));
+						try {
+							return stmtGetDistURI.executeSync(String.valueOf(w_id),String.valueOf(d_id));
+						} catch (UnsupportedEncodingException e) {
+							throw new CompletionException(e);
+						}
 					}, pool);
 
 			//var futGetCust = stmtGetCustURI.execute(String.valueOf(w_id),String.valueOf(d_id),String.valueOf(c_id));
@@ -534,7 +545,7 @@ public class NewOrderThespis extends TPCCProcedure {
 //
 //			total_amount *= (1 + w_tax + d_tax) * (1 - c_discount);
 		}// catch(Procedure.UserAbortException | JSONException userEx)
-		catch(UserAbortException | JSONException userEx)
+		catch(UserAbortException | JSONException | UnsupportedEncodingException userEx)
 		{
 		    LOG.error("Caught an expected error in New Order");
 		    throw new RuntimeException(userEx);

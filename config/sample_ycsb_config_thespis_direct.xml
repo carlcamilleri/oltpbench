@@ -9,15 +9,15 @@
     <username>postgres</username>
     <password>HRy4TK*V</password>
     <isolation>TRANSACTION_READ_COMMITTED</isolation>
-    <thespisUrl>http://localhost:60000/</thespisUrl>
+    
 
-    <uploadCode></uploadCode>
-    <uploadUrl></uploadUrl>
+    <!-- <uploadCode></uploadCode>
+    <uploadUrl></uploadUrl> -->
     <!-- Scalefactor in YCSB is *1000 the number of rows in the USERTABLE-->
     <scalefactor>1200</scalefactor>
 
     <!-- The workload -->
-    <terminals>5</terminals>
+    <terminals>2</terminals>
     <works>
         <work>
             <time>60</time>

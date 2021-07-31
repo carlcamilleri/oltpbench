@@ -80,6 +80,7 @@ public class YCSBBenchmark extends BenchmarkModule {
                             }
                             return null;
                         }));
+                futGetTerminals.get(i).join();
 
 
             } // FOR
