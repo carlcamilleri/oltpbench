@@ -9,7 +9,7 @@
     <username>postgres</username>
     <password>HRy4TK*V</password>
     <isolation>TRANSACTION_READ_COMMITTED</isolation>
-    <thespisUrl>http://10.132.0.53:5000/</thespisUrl>
+    <thespisUrl>http://10.132.0.60:5000/</thespisUrl>
 
 
     <uploadCode></uploadCode>
@@ -39,16 +39,19 @@
          <groupings>
             <grouping>
                 <name>read</name>
-                <weights>100</weights>
+                <weights>100,0</weights>
             </grouping>
             <grouping>
                 <name>write</name>
-                <weights>100</weights>
+                <weights>0,100</weights>
             </grouping>
         </groupings>
 
         <transactiontype>
             <name>ReadRecordThespis</name>
+        </transactiontype>
+        <transactiontype>
+            <name>InsertRecordThespis</name>
         </transactiontype>
         <!-- <transactiontype>
             <name>InsertRecord</name>
