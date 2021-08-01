@@ -23,23 +23,37 @@ import java.sql.SQLException;
 
 import com.oltpbenchmark.api.Procedure;
 import com.oltpbenchmark.api.SQLStmt;
+import com.oltpbenchmark.api.Worker;
 import com.oltpbenchmark.benchmarks.ycsb.YCSBConstants;
+import org.apache.log4j.Logger;
 
 public class ReadRecord extends Procedure{
+    protected static final Logger LOG = Logger.getLogger(ReadRecord.class);
+
     public final SQLStmt readStmt = new SQLStmt(
         "SELECT * FROM USERTABLE WHERE YCSB_KEY=?"
     );
     
 	//FIXME: The value in ysqb is a byteiterator
+
     public void run(Connection conn, int keyname, String results[]) throws SQLException {
+
+
         PreparedStatement stmt = this.getPreparedStatement(conn, readStmt);
-        stmt.setInt(1, keyname);          
-        ResultSet r = stmt.executeQuery();
-        while(r.next()) {
-            for (int i = 0; i < YCSBConstants.NUM_FIELDS; i++)
-                results[i] = r.getString(i+1);
-        } // WHILE
-        r.close();
+        stmt.setInt(1, keyname);
+       // stmt.setQueryTimeout(1);
+
+        try (ResultSet r = stmt.executeQuery()) {
+            while (r.next()) {
+                for (int i = 0; i < YCSBConstants.NUM_FIELDS; i++)
+                    results[i] = r.getString(i + 1);
+            } // WHILE
+
+            r.close();
+        }
+
     }
+
+
 
 }
