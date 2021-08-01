@@ -47,6 +47,8 @@ public class YCSBBenchmark extends BenchmarkModule {
     protected List<Worker<? extends BenchmarkModule>> makeWorkersImpl(boolean verbose) throws IOException {
         List<Worker<? extends BenchmarkModule>> workers = new ArrayList<Worker<? extends BenchmarkModule>>();
         try {
+
+
             Connection metaConn = this.makeConnection();
 
             // LOADING FROM THE DATABASE IMPORTANT INFORMATION
@@ -65,30 +67,34 @@ public class YCSBBenchmark extends BenchmarkModule {
             res.close();
 
 
+//
+//            var futGetTerminals = new ArrayList<CompletableFuture<Worker<YCSBBenchmark>>>(workConf.getTerminals());
+//            for (int i = 0; i < workConf.getTerminals(); ++i) {
+//                //LOG.info(String.format("Launching termnal %s ", i));
+//                var curI = i;
+//                var initRecordCount = init_record_count+1;
+//                futGetTerminals.add(
+//                        CompletableFuture.supplyAsync(() -> {
+//                            try {
+//                                return YCSBWorkerFactory.createWorker(this, curI, initRecordCount);
+//                            } catch (SQLException throwables) {
+//                                throwables.printStackTrace();
+//                            }
+//                            return null;
+//                        }));
+//                //futGetTerminals.get(i).join();
+//
+//
+//            } // FOR
+//            var resFutures = Stream.of(futGetTerminals.toArray())
+//                    .map(f->((CompletableFuture<Worker<YCSBBenchmark>>)f))
+//                    .map(CompletableFuture::join).collect(Collectors.toList());
+//
+//            workers.addAll(resFutures);
 
-            var futGetTerminals = new ArrayList<CompletableFuture<Worker<YCSBBenchmark>>>(workConf.getTerminals());
             for (int i = 0; i < workConf.getTerminals(); ++i) {
-                //LOG.info(String.format("Launching termnal %s ", i));
-                var curI = i;
-                var initRecordCount = init_record_count+1;
-                futGetTerminals.add(
-                        CompletableFuture.supplyAsync(() -> {
-                            try {
-                                return YCSBWorkerFactory.createWorker(this, curI, initRecordCount);
-                            } catch (SQLException throwables) {
-                                throwables.printStackTrace();
-                            }
-                            return null;
-                        }));
-                futGetTerminals.get(i).join();
-
-
+                workers.add(new YCSBWorker(this, i, init_record_count + 1));
             } // FOR
-            var resFutures = Stream.of(futGetTerminals.toArray())
-                    .map(f->((CompletableFuture<Worker<YCSBBenchmark>>)f))
-                    .map(CompletableFuture::join).collect(Collectors.toList());
-
-            workers.addAll(resFutures);
 
             metaConn.close();
         } catch (SQLException e) {

@@ -113,11 +113,19 @@ public abstract class BenchmarkModule {
      * @throws SQLException
      */
     public final Connection makeConnection() throws SQLException {
+
+        try {
+            Class.forName("org.postgresql.Driver");
+        } catch (ClassNotFoundException e) {
+            e.printStackTrace();
+        }
+
         Connection conn = DriverManager.getConnection(
                 workConf.getDBConnection(),
                 workConf.getDBUsername(),
                 workConf.getDBPassword());
         Catalog.setSeparator(conn);
+
         return (conn);
     }
 
@@ -427,40 +435,30 @@ public abstract class BenchmarkModule {
      * @return
      */
     public Map<TransactionType, Procedure> getProcedures() {
-        //Map<TransactionType, Procedure> proc_xref = new HashMap<TransactionType, Procedure>();
-        if(proc_xref==null) {
-            synchronized (BenchmarkModule.class) {
-                if(proc_xref==null) {
+        Map<TransactionType, Procedure> proc_xref = new HashMap<TransactionType, Procedure>();
+        TransactionTypes txns = this.workConf.getTransTypes();
 
-                   var procXref = new  HashMap<TransactionType, Procedure>();
-                    TransactionTypes txns = this.workConf.getTransTypes();
-
-                    if (txns != null) {
-                        for (Class<? extends Procedure> procClass : this.supplementalProcedures) {
-                            TransactionType txn = txns.getType(procClass);
-                            if (txn == null) {
-                                txn = new TransactionType(procClass, procClass.hashCode(), true);
-                                txns.add(txn);
-                            }
-                        } // FOR
-
-                        for (TransactionType txn : txns) {
-                            Procedure proc = (Procedure) ClassUtil.newInstance(txn.getProcedureClass(),
-                                    new Object[0],
-                                    new Class<?>[0]);
-                            proc.initialize(this.workConf.getDBType());
-                            procXref.put(txn, proc);
-                            proc.loadSQLDialect(this.dialects);
-                        } // FOR
-                    }
-                    if (procXref.isEmpty()) {
-                        LOG.warn("No procedures defined for " + this);
-                    }
-                    proc_xref = procXref;
+        if (txns != null) {
+            for (Class<? extends Procedure> procClass : this.supplementalProcedures) {
+                TransactionType txn = txns.getType(procClass);
+                if (txn == null) {
+                    txn = new TransactionType(procClass, procClass.hashCode(), true);
+                    txns.add(txn);
                 }
-            }
-        }
+            } // FOR
 
+            for (TransactionType txn : txns) {
+                Procedure proc = (Procedure)ClassUtil.newInstance(txn.getProcedureClass(),
+                        new Object[0],
+                        new Class<?>[0]);
+                proc.initialize(this.workConf.getDBType());
+                proc_xref.put(txn, proc);
+                proc.loadSQLDialect(this.dialects);
+            } // FOR
+        }
+        if (proc_xref.isEmpty()) {
+            LOG.warn("No procedures defined for " + this);
+        }
         return (proc_xref);
     }
 
