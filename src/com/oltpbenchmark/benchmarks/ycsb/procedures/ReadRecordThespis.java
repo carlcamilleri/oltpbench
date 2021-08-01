@@ -63,24 +63,24 @@ public class ReadRecordThespis extends Procedure{
 
             var resGetUserTable = readStmtUri.executeSync(new String[]{String.valueOf(keyname)});;
 
-        JSONArray jarrGetCust = null;
+//        JSONArray jarrGetCust = null;
+//
+//            jarrGetCust = new JSONObject(resGetUserTable).getJSONArray("entities");
+//
+//
+//        if(jarrGetCust.length()!=1)
+//            throw new RuntimeException("Invalid response: "+resGetUserTable);
+//
+//        var userTableObj = jarrGetCust.getJSONObject(0).getJSONObject("data");
+//
+//
+//
+//        for (int i = 1; i <= YCSBConstants.NUM_FIELDS; i++)
+//            results[i-1] = userTableObj.getString("field"+ i);
+//
 
-            jarrGetCust = new JSONObject(resGetUserTable).getJSONArray("entities");
 
-
-        if(jarrGetCust.length()!=1)
-            throw new RuntimeException("Invalid response: "+resGetUserTable);
-
-        var userTableObj = jarrGetCust.getJSONObject(0).getJSONObject("data");
-
-
-
-        for (int i = 1; i <= YCSBConstants.NUM_FIELDS; i++)
-            results[i-1] = userTableObj.getString("field"+ i);
-
-
-
-        } catch(UserAbortException | JSONException | UnsupportedEncodingException userEx)
+        } catch(UserAbortException   | UnsupportedEncodingException userEx)
         {
             LOG.error("Caught an expected error in New Order");
             throw new RuntimeException(userEx);
