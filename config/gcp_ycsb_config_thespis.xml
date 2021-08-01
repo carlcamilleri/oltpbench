@@ -18,7 +18,7 @@
     <scalefactor>1200</scalefactor>
 
     <!-- The workload -->
-    <terminals>20</terminals>
+    <terminals>25</terminals>
     <works>
         <work>
             <time>60</time>
@@ -26,12 +26,12 @@
             <!-- <weights>90,10</weights> -->
             <weights>read</weights>
         </work>
-        <work>
-            <time>60</time>
-            <rate>unlimited</rate>
-            <!-- <weights>90,10</weights> -->
-            <weights>write</weights>
-        </work>
+<!--        <work>-->
+<!--            <time>60</time>-->
+<!--            <rate>unlimited</rate>-->
+<!--            &lt;!&ndash; <weights>90,10</weights> &ndash;&gt;-->
+<!--            <weights>write</weights>-->
+<!--        </work>-->
     </works>
 
     <!-- YCSB Procedures declaration -->
