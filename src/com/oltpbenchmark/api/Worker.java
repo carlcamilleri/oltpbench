@@ -52,7 +52,7 @@ public abstract class Worker<T extends BenchmarkModule> implements Runnable {
 
     private final int id;
     private final T benchmarkModule;
-    protected final Connection conn;
+    protected Connection conn;
     protected final WorkloadConfiguration wrkld;
     protected final TransactionTypes transactionTypes;
     protected final Map<TransactionType, Procedure> procedures = new HashMap<TransactionType, Procedure>();
@@ -83,6 +83,7 @@ public abstract class Worker<T extends BenchmarkModule> implements Runnable {
             try {
                 this.conn = this.benchmarkModule.makeConnection();
                 this.conn.setAutoCommit(false);
+                //this.conn.setNetworkTimeout(Runnable::run,1);
 
                 // 2018-01-11: Since we want to support NoSQL systems
                 // that do not support txns, we will not invoke certain JDBC functions
@@ -217,6 +218,7 @@ public abstract class Worker<T extends BenchmarkModule> implements Runnable {
 
     @Override
     public final void run() {
+        LOG.info("Starting Worker "+this.id);
         Thread t = Thread.currentThread();
         SubmittedProcedure pieceOfWork;
         t.setName(this.toString());
@@ -300,8 +302,11 @@ public abstract class Worker<T extends BenchmarkModule> implements Runnable {
 
             TransactionType type = invalidTT;
             try {
+                //LOG.info("DoWork Worker: "+this.id+  " "+pieceOfWork.getClass().getName());
                 type = doWork(preState == State.MEASURE, pieceOfWork);
-            } catch (IndexOutOfBoundsException e) {
+                //LOG.info("DidWork Worker: "+this.id+  " "+pieceOfWork.getClass().getName());
+            } catch (Exception e) {
+                LOG.info("Exception Worker: "+this.id);
                 if (phase.isThroughputRun()) {
                     LOG.error("Thread tried executing disabled phase!");
                     throw e;
@@ -357,7 +362,7 @@ public abstract class Worker<T extends BenchmarkModule> implements Runnable {
 
             wrkldState.finishedWork();
         }
-
+        LOG.info("Finished Worker: "+this.id);
         tearDown(false);
     }
 
@@ -392,11 +397,14 @@ public abstract class Worker<T extends BenchmarkModule> implements Runnable {
                     // }
 
                     status = TransactionStatus.UNKNOWN;
+                    LOG.info("Executing work: "+this.id);
                     status = this.executeWork(next);
+                    LOG.info("Executed work: "+this.id);
 
                 // User Abort Handling
                 // These are not errors
-                } catch (UserAbortException ex) {
+                }
+                catch (UserAbortException ex) {
                     if (LOG.isDebugEnabled())
                         LOG.trace(next + " Aborted", ex);
 

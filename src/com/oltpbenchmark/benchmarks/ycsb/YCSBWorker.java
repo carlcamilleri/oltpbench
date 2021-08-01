@@ -20,6 +20,7 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Random;
+import java.util.concurrent.*;
 import java.util.stream.Collectors;
 
 import com.oltpbenchmark.api.Procedure;
@@ -87,7 +88,7 @@ public class YCSBWorker extends Worker<YCSBBenchmark> {
     @Override
     protected TransactionStatus executeWork(TransactionType nextTrans) throws UserAbortException, SQLException {
         Class<? extends Procedure> procClass = nextTrans.getProcedureClass();
-        
+
         if (procClass.equals(DeleteRecord.class)) {
             deleteRecord();
         } else if (procClass.equals(InsertRecord.class)) {
@@ -121,10 +122,38 @@ public class YCSBWorker extends Worker<YCSBBenchmark> {
     }
 
     private void readRecord() throws SQLException {
+
         assert (this.procReadRecord != null);
         int keyname = readRecord.nextInt();
-        this.procReadRecord.run(conn, keyname, this.results);
 
+        LOG.info("Executing read " +this.getId() +" for key "+keyname);
+        try {
+        this.procReadRecord.run(conn, keyname, this.results);
+//        try {
+//            var f = CompletableFuture.supplyAsync(()->{
+//                try {
+//                    this.procReadRecord.run(conn, keyname, this.results);
+//                } catch (SQLException ex) {
+//                    throw new CompletionException(ex);
+//                }
+//                return 1;
+//            });
+//
+//            f.get(5, TimeUnit.SECONDS);
+
+
+        }
+        catch(Exception ex){
+
+            //try {
+                throw ex;
+//            } catch (InterruptedException  | ExecutionException  | TimeoutException e) {
+//                this.conn =  getBenchmarkModule().makeConnection();
+//                this.conn.setAutoCommit(false);
+//                e.printStackTrace();
+//            }
+        }
+        LOG.info("Executed read " +this.getId());
         //LOG.info(String.join(",",Arrays.asList(this.results)));
     }
 
