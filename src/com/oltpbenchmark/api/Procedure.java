@@ -124,11 +124,6 @@ public abstract class Procedure {
     public final PreparedStatement getPreparedStatementReturnKeys(Connection conn, SQLStmt stmt, int[] is) throws SQLException {
         assert(this.name_stmt_xref != null) : "The Procedure " + this + " has not been initialized yet!";
         PreparedStatement pStmt = this.prepardStatements.get(stmt);
-        if(pStmt!=null && pStmt.isClosed())
-        {
-            this.prepardStatements.remove(pStmt);
-            pStmt=null;
-        }
         if (pStmt == null) {
             assert(this.stmt_name_xref.containsKey(stmt)) :
                 "Unexpected SQLStmt handle in " + this.getClass().getSimpleName() + "\n" + this.name_stmt_xref;
