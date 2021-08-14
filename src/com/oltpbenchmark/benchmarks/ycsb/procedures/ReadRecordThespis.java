@@ -50,7 +50,7 @@ public class ReadRecordThespis extends Procedure{
         try {
         //var readStmtUri = new RESTStmt(thespisUrl+"api/query/select/ycsb/USERTABLE?w=ycsb_key:[0]");
         var readStmtUri = new RESTStmt(thespisUrl+"actor/ycsb/USERTABLE?w=ycsb_key:[0]");
-            var readStmtUri = new RESTStmt("http://localhost:60000/");
+
 
 //        var futGetUserTable =
 //                CompletableFuture.supplyAsync(() -> {
