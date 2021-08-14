@@ -5,7 +5,7 @@
     <dbtype>postgres</dbtype>
     <driver>org.postgresql.Driver</driver>
     <!--<DBUrl>jdbc:postgresql://35.195.218.115:5432/tpc_c</DBUrl>-->
-    <DBUrl>jdbc:postgresql://23.251.133.10:6432/ycsb?prepareThreshold=0</DBUrl>
+    <DBUrl>jdbc:postgresql://34.140.198.218:6432/ycsb?prepareThreshold=0</DBUrl>
     <username>postgres</username>
     <password>HRy4TK*V</password>
     <isolation>TRANSACTION_READ_COMMITTED</isolation>
@@ -17,12 +17,12 @@
     <scalefactor>1200</scalefactor>
 
     <!-- The workload -->
-    <terminals>5</terminals>
+    <terminals>1</terminals>
     <works>
         <work>
             <time>60</time>
             <rate>unlimited</rate>
-            <weights>0,0,100</weights>
+            <weights>100,0,0</weights>
             <!--<weights>100</weights>-->
         </work>
     </works>

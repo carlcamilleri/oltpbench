@@ -30,6 +30,7 @@ import java.io.UnsupportedEncodingException;
 import java.net.*;
 
 import java.nio.charset.StandardCharsets;
+import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Executors;
@@ -61,6 +62,7 @@ public final class RESTStmt {
     private static final OkHttpClient client = new OkHttpClient.Builder()
             .connectTimeout(10, TimeUnit.SECONDS)
             .readTimeout(10, TimeUnit.SECONDS)
+            .protocols(Collections.singletonList(Protocol.H2_PRIOR_KNOWLEDGE))
             //.dispatcher(new Dispatcher(Executors.newFixedThreadPool(256)))
             .retryOnConnectionFailure(true)
             .socketFactory(new SocketFactoryTcpNoDelay())
