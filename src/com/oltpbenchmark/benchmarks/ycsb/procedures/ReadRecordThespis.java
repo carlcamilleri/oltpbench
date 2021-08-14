@@ -49,7 +49,7 @@ public class ReadRecordThespis extends Procedure{
     public void run(String thespisUrl, int keyname, String results[]) throws SQLException {
         try {
         //var readStmtUri = new RESTStmt(thespisUrl+"api/query/select/ycsb/USERTABLE?w=ycsb_key:[0]");
-        var readStmtUri = new RESTStmt(thespisUrl+"/actor");
+        var readStmtUri = new RESTStmt(thespisUrl+"actor");
 
 //        var futGetUserTable =
 //                CompletableFuture.supplyAsync(() -> {
