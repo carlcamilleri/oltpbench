@@ -56,5 +56,8 @@
 		<dependency org="javax.xml.bind" name="jaxb-api" rev="2.3.0" force="true" conf="compile->compile(*),master(*);runtime->runtime(*)"/>
 		<dependency org="com.sun.xml.bind" name="jaxb-core" rev="2.3.0" force="true" conf="compile->compile(*),master(*);runtime->runtime(*)"/>
 		<dependency org="com.sun.xml.bind" name="jaxb-impl" rev="2.3.0" force="true" conf="compile->compile(*),master(*);runtime->runtime(*)"/>
+		<dependency org="io.grpc" name="grpc-netty"  rev="1.39.0" force="true" conf="compile->compile(*),master(*);runtime->runtime(*)"/>
+		<dependency org="io.grpc" name="grpc-protobuf"  rev="1.39.0" force="true" conf="compile->compile(*),master(*);runtime->runtime(*)"/>
+		<dependency org="io.grpc" name="grpc-stub"  rev="1.39.0" force="true" conf="compile->compile(*),master(*);runtime->runtime(*)"/>
 	</dependencies>
 </ivy-module>
