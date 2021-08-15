@@ -5,7 +5,7 @@ import io.grpc.ManagedChannelBuilder;
 
 public class ThespisClient {
 
-    private static  ManagedChannel _channel = ManagedChannelBuilder.forAddress("instance-1", 5001)
+    private static  ManagedChannel _channel = ManagedChannelBuilder.forAddress("10.132.15.193", 30004)
             .usePlaintext()
             .build();
 
