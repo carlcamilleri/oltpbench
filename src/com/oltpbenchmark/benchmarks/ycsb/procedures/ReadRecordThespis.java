@@ -49,48 +49,48 @@ public class ReadRecordThespis extends Procedure{
 	//FIXME: The value in ysqb is a byteiterator
     public void run(String thespisUrl, int keyname, String results[]) throws SQLException {
 
-        var res= ThespisClient.select(keyname);
+     //   var res= ThespisClient.select(keyname);
 
-//        try {
-//        var readStmtUri = new RESTStmt(thespisUrl+"api/query-db/select/ycsb/USERTABLE?w=ycsb_key:[0]");
-//        //var readStmtUri = new RESTStmt(thespisUrl+"actor/ycsb/USERTABLE?w=ycsb_key:[0]");
-//            //var readStmtUri = new RESTStmt(thespisUrl);
+        try {
+            var readStmtUri = new RESTStmt(thespisUrl+"api/query/select/ycsb/USERTABLE?w=ycsb_key:[0]");
+        //var readStmtUri = new RESTStmt(thespisUrl+"actor/ycsb/USERTABLE?w=ycsb_key:[0]");
+            //var readStmtUri = new RESTStmt(thespisUrl);
+
+
+//        var futGetUserTable =
+//                CompletableFuture.supplyAsync(() -> {
+//                    return readStmtUri.executeSync(new String[]{String.valueOf(keyname)});
+//                }, pool);
+//
+//        var resFutures = Stream.of(futGetUserTable)
+//                .map(CompletableFuture::join).collect(Collectors.toList());
+//
+//        var resGetUserTable = resFutures.get(0);
+
+            var resGetUserTable = readStmtUri.executeSync(new String[]{String.valueOf(keyname)});;
+
+//        JSONArray jarrGetCust = null;
+//
+//            jarrGetCust = new JSONObject(resGetUserTable).getJSONArray("entities");
 //
 //
-////        var futGetUserTable =
-////                CompletableFuture.supplyAsync(() -> {
-////                    return readStmtUri.executeSync(new String[]{String.valueOf(keyname)});
-////                }, pool);
-////
-////        var resFutures = Stream.of(futGetUserTable)
-////                .map(CompletableFuture::join).collect(Collectors.toList());
-////
-////        var resGetUserTable = resFutures.get(0);
+//        if(jarrGetCust.length()!=1)
+//            throw new RuntimeException("Invalid response: "+resGetUserTable);
 //
-//            var resGetUserTable = readStmtUri.executeSync(new String[]{String.valueOf(keyname)});;
-//
-////        JSONArray jarrGetCust = null;
-////
-////            jarrGetCust = new JSONObject(resGetUserTable).getJSONArray("entities");
-////
-////
-////        if(jarrGetCust.length()!=1)
-////            throw new RuntimeException("Invalid response: "+resGetUserTable);
-////
-////        var userTableObj = jarrGetCust.getJSONObject(0).getJSONObject("data");
-////
-////
-////
-////        for (int i = 1; i <= YCSBConstants.NUM_FIELDS; i++)
-////            results[i-1] = userTableObj.getString("field"+ i);
-////
+//        var userTableObj = jarrGetCust.getJSONObject(0).getJSONObject("data");
 //
 //
-//        } catch(UserAbortException   | UnsupportedEncodingException userEx)
-//        {
-//            LOG.error("Caught an expected error in New Order");
-//            throw new RuntimeException(userEx);
-//        }
+//
+//        for (int i = 1; i <= YCSBConstants.NUM_FIELDS; i++)
+//            results[i-1] = userTableObj.getString("field"+ i);
+//
+
+
+        } catch(UserAbortException   | UnsupportedEncodingException userEx)
+        {
+            LOG.error("Caught an expected error in New Order");
+            throw new RuntimeException(userEx);
+        }
     }
 
 }
