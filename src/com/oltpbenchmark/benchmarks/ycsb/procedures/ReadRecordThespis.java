@@ -52,10 +52,10 @@ public class ReadRecordThespis extends Procedure{
      //   var res= ThespisClient.select(keyname);
 
         try {
-            //var readStmtUri = new RESTStmt(thespisUrl+"api/query/select/ycsb/USERTABLE?w=ycsb_key:[0]");
+            var readStmtUri = new RESTStmt(thespisUrl+"api/query/select/ycsb/USERTABLE?w=ycsb_key:[0]");
 
         //var readStmtUri = new RESTStmt(thespisUrl+"actor/ycsb/USERTABLE?w=ycsb_key:[0]");
-            var readStmtUri = new RESTStmt(thespisUrl);
+            //var readStmtUri = new RESTStmt(thespisUrl);
 
 
 //        var futGetUserTable =
