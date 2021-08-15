@@ -48,9 +48,9 @@ public class ReadRecordThespis extends Procedure{
 	//FIXME: The value in ysqb is a byteiterator
     public void run(String thespisUrl, int keyname, String results[]) throws SQLException {
         try {
-        //var readStmtUri = new RESTStmt(thespisUrl+"api/query/select/ycsb/USERTABLE?w=ycsb_key:[0]");
+        var readStmtUri = new RESTStmt(thespisUrl+"api/query-db/select/ycsb/USERTABLE?w=ycsb_key:[0]");
         //var readStmtUri = new RESTStmt(thespisUrl+"actor/ycsb/USERTABLE?w=ycsb_key:[0]");
-            var readStmtUri = new RESTStmt(thespisUrl);
+            //var readStmtUri = new RESTStmt(thespisUrl);
 
 
 //        var futGetUserTable =
