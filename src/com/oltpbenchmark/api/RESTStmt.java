@@ -62,11 +62,12 @@ public final class RESTStmt {
     private static final OkHttpClient client = new OkHttpClient.Builder()
             .connectTimeout(10, TimeUnit.SECONDS)
             .readTimeout(10, TimeUnit.SECONDS)
-            //.protocols(Collections.singletonList(Protocol.H2_PRIOR_KNOWLEDGE))
+            .protocols(Collections.singletonList(Protocol.H2_PRIOR_KNOWLEDGE))
             //.dispatcher(new Dispatcher(Executors.newFixedThreadPool(256)))
+            .followRedirects(false)
             .retryOnConnectionFailure(true)
             .socketFactory(new SocketFactoryTcpNoDelay())
-            .connectionPool(new ConnectionPool(8,60,TimeUnit.SECONDS))
+            .connectionPool(new ConnectionPool(256,60,TimeUnit.SECONDS))
 
 
 //            .eventListener(new EventListener() {
