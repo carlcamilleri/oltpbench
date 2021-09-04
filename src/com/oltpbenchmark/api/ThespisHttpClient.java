@@ -4,9 +4,7 @@ import com.oltpbenchmark.util.SocketFactoryTcpNoDelay;
 import okhttp3.ConnectionPool;
 import okhttp3.OkHttpClient;
 
-import javax.net.ssl.SSLContext;
-import javax.net.ssl.TrustManager;
-import javax.net.ssl.X509TrustManager;
+import javax.net.ssl.*;
 import java.security.KeyManagementException;
 import java.security.NoSuchAlgorithmException;
 import java.util.concurrent.TimeUnit;
@@ -43,6 +41,12 @@ public   class ThespisHttpClient {
                         instance = new OkHttpClient.Builder()
                                 .connectTimeout(10, TimeUnit.SECONDS)
                                 .readTimeout(10, TimeUnit.SECONDS)
+                                .hostnameVerifier(new HostnameVerifier() {
+                                    @Override
+                                    public boolean verify(String hostname, SSLSession session) {
+                                        return true;
+                                    }
+                                })
                                 .sslSocketFactory(sslContext.getSocketFactory(),
                                         new X509TrustManager() {
                                             @Override
@@ -57,6 +61,8 @@ public   class ThespisHttpClient {
                                             public java.security.cert.X509Certificate[] getAcceptedIssuers() {
                                                 return new java.security.cert.X509Certificate[]{};
                                             }
+
+
                                         })
                         //.protocols(Collections.singletonList(Protocol.H2_PRIOR_KNOWLEDGE))
                         //.dispatcher(new Dispatcher(Executors.newFixedThreadPool(256)))
@@ -98,6 +104,8 @@ public   class ThespisHttpClient {
 //                }
 //            })
                                 .build();
+
+
 
 
                     } catch (NoSuchAlgorithmException | KeyManagementException e) {
