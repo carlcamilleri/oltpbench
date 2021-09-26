@@ -55,7 +55,7 @@ public class ReadRecordThespis extends Procedure{
             //var readStmtUri = new RESTStmt(thespisUrl+"api/query/select/ycsb/USERTABLE?w=ycsb_key:[0]");
 
         //var readStmtUri = new RESTStmt(thespisUrl+"actor/ycsb/USERTABLE?w=ycsb_key:[0]");
-            var readStmtUri = new RESTStmt(thespisUrl+"2");
+            var readStmtUri = new RESTStmt(thespisUrl+"3");
 
 
 //        var futGetUserTable =
